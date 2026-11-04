@@ -166,6 +166,14 @@ const AccountProviders = [
     headerIcon: 'setup-icon-provider-imap.png',
     color: '#aaa',
   },
+  {
+    provider: 'pop3',
+    displayName: 'POP3 / SMTP',
+    displayNameShort: 'POP3',
+    icon: 'ic-settings-account-imap.png',
+    headerIcon: 'setup-icon-provider-imap.png',
+    color: '#888',
+  },
 ];
 
 export default AccountProviders;

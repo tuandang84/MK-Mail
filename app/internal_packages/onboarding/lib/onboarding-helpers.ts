@@ -42,6 +42,8 @@ function idForAccount(emailAddress: string, connectionSettings) {
   const settingsThatCouldChangeMailContents = {
     imap_username: connectionSettings.imap_username,
     imap_host: connectionSettings.imap_host,
+    pop3_username: connectionSettings.pop3_username,
+    pop3_host: connectionSettings.pop3_host,
     smtp_username: connectionSettings.smtp_username,
     smtp_host: connectionSettings.smtp_host,
   };

@@ -100,6 +100,12 @@ export class Account extends ModelWithMetadata {
     imap_password: string;
     imap_allow_insecure_ssl: boolean;
     imap_security: 'SSL / TLS' | 'STARTTLS' | 'none';
+    pop3_host?: string;
+    pop3_port?: number;
+    pop3_username?: string;
+    pop3_password?: string;
+    pop3_allow_insecure_ssl?: boolean;
+    pop3_security?: 'SSL / TLS' | 'STARTTLS' | 'none';
     smtp_host: string;
     smtp_port: number;
     smtp_username: string;
@@ -219,6 +225,8 @@ export class Account extends ModelWithMetadata {
       return 'Yahoo';
     } else if (this.provider === 'imap') {
       return 'IMAP';
+    } else if (this.provider === 'pop3') {
+      return 'POP3';
     } else if (this.provider === 'yandex') {
       return 'Yandex';
     } else if (this.provider === 'office365') {

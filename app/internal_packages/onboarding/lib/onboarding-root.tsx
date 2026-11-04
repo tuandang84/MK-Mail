@@ -12,6 +12,7 @@ import AccountSettingsPage from './page-account-settings';
 import AccountSettingsPageGmail from './page-account-settings-gmail';
 import AccountSettingsPageO365 from './page-account-settings-o365';
 import AccountSettingsPageIMAP from './page-account-settings-imap';
+import AccountSettingsPagePOP3 from './page-account-settings-pop3';
 import AccountOnboardingSuccess from './page-account-onboarding-success';
 import InitialPreferencesPage from './page-initial-preferences';
 import InitialSubscriptionPage from './page-initial-subscription';
@@ -29,6 +30,7 @@ const PageComponents = {
   'account-settings-o365': AccountSettingsPageO365,
   'account-settings-outlook': AccountSettingsPageOutlook,
   'account-settings-imap': AccountSettingsPageIMAP,
+  'account-settings-pop3': AccountSettingsPagePOP3,
   'account-certificate': AccountCertificatePage,
   'account-onboarding-success': AccountOnboardingSuccess,
   'initial-preferences': InitialPreferencesPage,

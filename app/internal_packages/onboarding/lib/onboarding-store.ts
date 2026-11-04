@@ -52,6 +52,8 @@ class OnboardingStore extends MailspringStore {
         this._pageStack = ['account-choose', 'account-settings-outlook'];
       } else if (this._account.provider === 'imap') {
         this._pageStack = ['account-choose', 'account-settings', 'account-settings-imap'];
+      } else if (this._account.provider === 'pop3') {
+        this._pageStack = ['account-choose', 'account-settings', 'account-settings-pop3'];
       } else {
         this._pageStack = ['account-choose', 'account-settings'];
       }
@@ -93,7 +95,9 @@ class OnboardingStore extends MailspringStore {
           ? 'account-settings-o365'
           : provider === 'outlook'
             ? 'account-settings-outlook'
-            : 'account-settings';
+            : provider === 'pop3'
+              ? 'account-settings-pop3'
+              : 'account-settings';
 
     // Don't carry over any type-specific account information
     this._onSetAccount(

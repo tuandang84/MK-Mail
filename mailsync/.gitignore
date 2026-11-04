@@ -1,0 +1,29 @@
+.DS_Store
+*.xcuserstate
+*.xcbkptlist
+MailSync.xcodeproj/xcuserdata
+/build
+/postinstall.sh
+/Windows/debug
+/Windows/release
+/Windows/enc_temp_folder
+/Windows/.vs/
+/Windows/mailsync.VC.*
+/Windows/mailsync.vcxproj.user
+/Windows/.vs/mailsync/v14/.suo
+/MailSync.xcodeproj/project.xcworkspace/xcuserdata/bengotow.xcuserdatad/IDEFindNavigatorScopes.plist
+/Vendor/libetpan/build-mac/DerivedData
+/DerivedData
+
+# CMake build artifacts (Linux)
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+/mailsync
+!/MailSync/
+/vcard_test
+/Vendor/mailcore2/build/
+
+# Local build prefix for vendored libetpan (see BUILDING.md)
+/Vendor/_install/

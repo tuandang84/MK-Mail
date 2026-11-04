@@ -209,6 +209,9 @@ const CreatePageForForm = (FormComponent: React.ComponentType<any> & Record<stri
             if (/smtp/i.test(err.message)) {
               errorFieldNames.push('settings.smtp_username');
               errorFieldNames.push('settings.smtp_password');
+            } else if (account.provider === 'pop3') {
+              errorFieldNames.push('settings.pop3_username');
+              errorFieldNames.push('settings.pop3_password');
             } else {
               errorFieldNames.push('settings.imap_username');
               errorFieldNames.push('settings.imap_password');

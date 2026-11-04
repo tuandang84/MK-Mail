@@ -214,7 +214,9 @@ class PreferencesAccountDetails extends Component<
         `Platform: ${process.platform}`,
         `Account State: ${syncState}`,
         `Account Provider: ${provider}`,
-        `IMAP Server: ${settings.imap_host}`,
+        provider === 'pop3'
+          ? `POP3 Server: ${settings.pop3_host}`
+          : `IMAP Server: ${settings.imap_host}`,
         `SMTP Server: ${settings.smtp_host}`,
         `--------------------------------------------`,
         logs,

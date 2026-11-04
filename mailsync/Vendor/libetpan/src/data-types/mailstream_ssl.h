@@ -1,0 +1,199 @@
+/*
+ * libEtPan! -- a mail stuff library
+ *
+ * Copyright (C) 2001, 2005 - DINH Viet Hoa
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the libEtPan! project nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+/*
+ * $Id: mailstream_ssl.h,v 1.18 2008/07/03 19:42:27 colinleroy Exp $
+ */
+
+#ifndef MAILSTREAM_SSL_H
+
+#define MAILSTREAM_SSL_H
+
+#include <libetpan/mailstream.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* socket */
+
+#if LIBETPAN_IOS_DISABLE_SSL
+#undef USE_SSL
+#endif
+
+#ifdef USE_SSL
+extern mailstream_low_driver * mailstream_ssl_driver;
+#endif
+
+struct mailstream_ssl_context;
+
+LIBETPAN_EXPORT
+mailstream_low * mailstream_low_ssl_open(int fd);
+
+LIBETPAN_EXPORT
+mailstream_low * mailstream_low_ssl_open_timeout(int fd, time_t timeout);
+
+LIBETPAN_EXPORT
+mailstream_low * mailstream_low_tls_open(int fd);
+
+LIBETPAN_EXPORT
+mailstream_low * mailstream_low_tls_open_timeout(int fd, time_t timeout);
+
+LIBETPAN_EXPORT
+mailstream * mailstream_ssl_open(int fd);
+
+LIBETPAN_EXPORT
+mailstream * mailstream_ssl_open_timeout(int fd, time_t timeout);
+
+LIBETPAN_EXPORT
+mailstream * mailstream_ssl_open_with_callback(int fd,
+    void (* callback)(struct mailstream_ssl_context * ssl_context, void * data), void * data);
+
+LIBETPAN_EXPORT
+mailstream * mailstream_ssl_open_with_callback_timeout(int fd, time_t timeout,
+    void (* callback)(struct mailstream_ssl_context * ssl_context, void * data), void * data);
+
+LIBETPAN_EXPORT
+void mailstream_gnutls_init_not_required(void);
+
+LIBETPAN_EXPORT
+void mailstream_openssl_init_not_required(void);
+
+LIBETPAN_EXPORT
+void mailstream_ssl_init_not_required(void);
+
+LIBETPAN_EXPORT
+ssize_t mailstream_ssl_get_certificate(mailstream *stream, unsigned char **cert_DER);
+
+LIBETPAN_EXPORT
+mailstream_low * mailstream_low_ssl_open_with_callback(int fd,
+    void (* callback)(struct mailstream_ssl_context * ssl_context, void * data), void * data);
+
+LIBETPAN_EXPORT
+mailstream_low * mailstream_low_ssl_open_with_callback_timeout(int fd, time_t timeout,
+    void (* callback)(struct mailstream_ssl_context * ssl_context, void * data), void * data);
+
+LIBETPAN_EXPORT
+mailstream_low * mailstream_low_tls_open_with_callback(int fd,
+    void (* callback)(struct mailstream_ssl_context * ssl_context, void * data), void * data);
+
+LIBETPAN_EXPORT
+mailstream_low * mailstream_low_tls_open_with_callback_timeout(int fd, time_t timeout,
+    void (* callback)(struct mailstream_ssl_context * ssl_context, void * data), void * data);
+
+LIBETPAN_EXPORT
+int mailstream_ssl_set_client_certicate(struct mailstream_ssl_context * ssl_context,
+    char * file_name);
+
+LIBETPAN_EXPORT
+int mailstream_ssl_set_client_certificate_data(struct mailstream_ssl_context * ssl_context,
+    unsigned char *x509_der, size_t len);
+int mailstream_ssl_set_client_private_key_data(struct mailstream_ssl_context * ssl_context,
+    unsigned char *pkey_der, size_t len);
+
+LIBETPAN_EXPORT
+int mailstream_ssl_set_server_certicate(struct mailstream_ssl_context * ssl_context,
+    char * CAfile, char * CApath);
+
+LIBETPAN_EXPORT
+int mailstream_ssl_set_server_name(struct mailstream_ssl_context * ssl_context,
+    char * hostname);
+
+LIBETPAN_EXPORT
+void * mailstream_ssl_get_openssl_ssl_ctx(struct mailstream_ssl_context * ssl_context);
+
+/*
+  TLS compatibility levels.
+
+  Modern OpenSSL refuses a number of handshakes that older mail servers still
+  require. Apple's Security.framework (used through CFStream) is considerably
+  more permissive, which is why such servers often work on macOS but fail on
+  Windows and Linux with a bare "SSL error". These levels let a caller retry a
+  failed handshake with progressively relaxed settings.
+
+  MAILSTREAM_SSL_COMPAT_DEFAULT   - OpenSSL defaults, nothing relaxed.
+  MAILSTREAM_SSL_COMPAT_LEGACY    - allow servers without RFC 5746 secure
+                                    renegotiation, allow TLS 1.0/1.1, and pin
+                                    the security level to OpenSSL's own default
+                                    of 1 (distributions such as Debian ship a
+                                    build defaulting to 2). Still requires 80
+                                    bits of security.
+  MAILSTREAM_SSL_COMPAT_OBSOLETE  - security level 0. Additionally permits
+                                    SHA-1 signed certificates, RSA keys below
+                                    2048 bits and small DH parameters. This
+                                    waives checks a mail client should not
+                                    waive without the user's consent.
+*/
+#define MAILSTREAM_SSL_COMPAT_DEFAULT  0
+#define MAILSTREAM_SSL_COMPAT_LEGACY   1
+#define MAILSTREAM_SSL_COMPAT_OBSOLETE 2
+
+LIBETPAN_EXPORT
+int mailstream_ssl_set_compatibility_level(struct mailstream_ssl_context * ssl_context,
+    int level);
+
+/*
+  Description of the last TLS handshake failure on the calling thread, as
+  reported by the TLS backend (for example "dh key too small"). Returns an
+  empty string when the last handshake did not fail or when the backend does
+  not report a reason. The storage is thread-local and is reset at the start of
+  every handshake.
+*/
+LIBETPAN_EXPORT
+const char * mailstream_ssl_get_last_error(void);
+
+/*
+  Non-zero when the last handshake on the calling thread failed inside the TLS
+  backend rather than at the socket level. Callers use this to tell a TLS
+  negotiation failure (worth retrying at a lower compatibility level) from an
+  unreachable host.
+*/
+LIBETPAN_EXPORT
+int mailstream_ssl_has_last_error(void);
+
+/*
+  Forget any recorded failure on the calling thread. The handshake itself
+  resets this, but only once it is reached: a connection that fails earlier, at
+  the TCP level, leaves the previous handshake's reason in place. Callers that
+  ask about a specific attempt must clear this before making it, or a stale
+  reason will be read as belonging to the new attempt.
+*/
+LIBETPAN_EXPORT
+void mailstream_ssl_clear_last_error(void);
+
+LIBETPAN_EXPORT
+int mailstream_ssl_get_fd(struct mailstream_ssl_context * ssl_context);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
