@@ -2584,7 +2584,7 @@ void TaskProcessor::performRemoteSendDraft(Task * task) {
         sentImapMsg->setFlags(MessageFlagSeen);
 
         MailProcessor processor{account, store};
-        localMessage = processor.insertFallbackToUpdateMessage(sentImapMsg, *sent, syncDataTimestamp);
+        shared_ptr<Message> localMessage = processor.insertFallbackToUpdateMessage(sentImapMsg, *sent, syncDataTimestamp);
         if (localMessage != nullptr) {
             processor.retrievedMessageBody(localMessage.get(), messageParser);
         }

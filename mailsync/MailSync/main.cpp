@@ -338,6 +338,15 @@ int runTestAuth(shared_ptr<Account> account, string & errorService) {
     MCLogEnabled = 1;
     MCLogFn = MCLogToAccumulatorLog;
 
+    IMAPSession session;
+    SMTPSession smtp;
+    ErrorCode err = ErrorNone;
+    string tlsAdvice = "";
+    mailcore::Array * folders = nullptr;
+    string mainPrefix = "";
+    string containerFolderPath = account->containerFolder();
+    Address * from = Address::addressWithDisplayName(AS_MCSTR(account->name()), AS_MCSTR(account->emailAddress()));
+
     // NOTE: This method returns the account upon success but the client is not
     // reading the result. This function cannot mutate the account object.
 
@@ -348,7 +357,7 @@ int runTestAuth(shared_ptr<Account> account, string & errorService) {
         mailpop3 * pop3 = mailpop3_new(0, NULL);
         if (!pop3) {
             alogger.log("Failed to allocate mailpop3 session\n");
-            err = ErrorMemory;
+            err = ErrorConnection;
             goto done;
         }
         mailpop3_set_timeout(pop3, 30);

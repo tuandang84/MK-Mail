@@ -8,6 +8,7 @@
 
 #include "POP3SyncWorker.hpp"
 #include "MailUtils.hpp"
+#include "MailStoreTransaction.hpp"
 #include "SyncException.hpp"
 
 POP3SyncWorker::POP3SyncWorker(shared_ptr<Account> account) :
@@ -57,7 +58,7 @@ mailpop3 * POP3SyncWorker::connectAndLogin(string & errorService, ErrorCode & ou
     mailpop3 * pop3 = mailpop3_new(0, NULL);
     if (!pop3) {
         logger->error("Failed to allocate mailpop3 session");
-        outErr = ErrorCode::ErrorMemory;
+        outErr = ErrorCode::ErrorConnection;
         return nullptr;
     }
     mailpop3_set_timeout(pop3, 30);
@@ -195,7 +196,7 @@ bool POP3SyncWorker::syncNow()
     if (!pop3) {
         inbox->localStatus()["busy"] = false;
         store->save(inbox.get());
-        throw SyncException(err, "POP3 connection / authentication failed", true);
+        throw SyncException(err, "POP3 connection / authentication failed");
     }
 
     // Load all existing UIDLs for this account
@@ -220,7 +221,7 @@ bool POP3SyncWorker::syncNow()
         disconnect(pop3);
         inbox->localStatus()["busy"] = false;
         store->save(inbox.get());
-        throw SyncException(ErrorCode::ErrorConnection, "POP3 LIST failed", true);
+        throw SyncException(ErrorCode::ErrorConnection, "POP3 LIST failed");
     }
 
     unsigned int totalCount = carray_count(msg_tab);
