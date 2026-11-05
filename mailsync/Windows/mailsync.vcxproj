@@ -61,7 +61,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;libcurl.lib;libxml2.lib;zlib.lib;iconv.lib;dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Ws2_32.lib;Dnsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(TargetDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libetpan.lib;legacy_stdio_definitions.lib;libcurl.lib;libxml2.lib;zlib.lib;iconv.lib;dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Ws2_32.lib;Dnsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -81,7 +82,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;libcurl.lib;libxml2.lib;zlib.lib;iconv.lib;dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Ws2_32.lib;Dnsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(TargetDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libetpan.lib;legacy_stdio_definitions.lib;libcurl.lib;libxml2.lib;zlib.lib;iconv.lib;dbghelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Ws2_32.lib;Dnsapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <!-- vcpkg's VcpkgAppLocalDeploy handles DLL copying automatically -->
   </ItemDefinitionGroup>
@@ -153,6 +155,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Vendor\mailcore2\build-windows\mailcore2\mailcore2\mailcore2.vcxproj">
       <Project>{aad35e01-77e4-43cb-bbb4-f7f6692ea829}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Vendor\libetpan\build-windows\libetpan\libetpan.vcxproj">
+      <Project>{ba4ded3c-e56f-4484-bfc3-9c13e461a1be}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

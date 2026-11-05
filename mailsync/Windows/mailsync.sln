@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mailsync", "mailsync.vcxproj", "{FD5B276A-CB56-4697-8C6F-C02FF68AB435}"
 	ProjectSection(ProjectDependencies) = postProject
 		{AAD35E01-77E4-43CB-BBB4-F7F6692EA829} = {AAD35E01-77E4-43CB-BBB4-F7F6692EA829}
+		{BA4DED3C-E56F-4484-BFC3-9C13E461A1BE} = {BA4DED3C-E56F-4484-BFC3-9C13E461A1BE}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mailcore2", "..\Vendor\mailcore2\build-windows\mailcore2\mailcore2\mailcore2.vcxproj", "{AAD35E01-77E4-43CB-BBB4-F7F6692EA829}"
