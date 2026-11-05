@@ -1,4 +1,4 @@
-name: Build MK-Mail (Windows)
+name: Build MK-Mail Windows x64 MSI
 
 on:
   push:
@@ -14,7 +14,8 @@ env:
   VCPKG_OVERLAY_PORTS: ${{ github.workspace }}/mailsync/vcpkg-overlay-ports
 
 jobs:
-  build:
+  build-msi:
+    name: Build Windows x64 MSI
     runs-on: windows-2022
 
     steps:
@@ -139,27 +140,28 @@ jobs:
             Write-Host "Synced mailsync.exe and DLLs to $unpacked"
           }
 
-      - name: Create Windows Installer
-        run: node app/build/create-signed-windows-installer.js
-
-      - name: Create Portable Zip Package
+      - name: Setup WiX Toolset
         shell: pwsh
         run: |
-          Compress-Archive -Path "app\dist\mailspring-win32-x64\*" -DestinationPath "app\dist\MK-Mail-win32-x64-portable.zip" -Force
-          Write-Host "Portable zip package created at app\dist\MK-Mail-win32-x64-portable.zip"
+          $wixPath = "C:\Program Files (x86)\WiX Toolset v3.11\bin"
+          if (-not (Test-Path (Join-Path $wixPath "candle.exe"))) {
+            Write-Host "Installing WiX via Chocolatey..."
+            choco install wixtoolset -y
+          }
+          if (Test-Path $wixPath) {
+            echo "$wixPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          }
 
-      - name: Upload Installer Artifact
+      - name: Build Windows x64 MSI Installer
+        shell: pwsh
+        run: |
+          & .\app\build\msi\create-msi.ps1
+
+      - name: Upload MSI Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MK-Mail-Setup-x64
-          path: app/dist/MailspringSetup.exe
-          if-no-files-found: error
-
-      - name: Upload Portable Zip Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: MK-Mail-Portable-x64
-          path: app/dist/MK-Mail-win32-x64-portable.zip
+          name: MK-Mail-Setup-x64-msi
+          path: app/dist/MK-Mail-Setup-x64.msi
           if-no-files-found: error
 
       - name: Create GitHub Release
@@ -167,20 +169,19 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: pop3-latest
-          name: "MK-Mail with POP3 Support"
+          name: "MK-Mail Windows x64 MSI with POP3 Support"
           prerelease: false
           body: |
-            ## MK-Mail with POP3 & SMTP Support
+            ## MK-Mail for Windows x64 (MSI Installer) with POP3 & SMTP Support
 
             ### Features:
+            - **Native Windows x64 MSI Installer**: Installs natively to `Program Files\MK-Mail` with desktop and start menu shortcuts.
             - **Native POP3 Engine (C++)**: Full POP3 implementation in `mailsync` using `libetpan` with SSL/TLS, UIDL tracking in SQLite, RFC822 parsing, and direct SMTP sent-box save.
             - **Modern POP3 Setup UI**: Direct POP3 account setup form & provider option in Mailspring onboarding.
 
             ### Downloads:
-            - **`MailspringSetup.exe`**: Windows Installer.
-            - **`MK-Mail-win32-x64-portable.zip`**: Portable edition (extract and double-click `Mailspring.exe` to run immediately).
+            - **`MK-Mail-Setup-x64.msi`**: Official Windows x64 MSI Installer.
           files: |
-            app/dist/MailspringSetup.exe
-            app/dist/MK-Mail-win32-x64-portable.zip
+            app/dist/MK-Mail-Setup-x64.msi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
