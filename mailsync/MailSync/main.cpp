@@ -345,7 +345,7 @@ int runTestAuth(shared_ptr<Account> account, string & errorService) {
     mailcore::Array * folders = nullptr;
     string mainPrefix = "";
     string containerFolderPath = account->containerFolder();
-    Address * from = Address::addressWithDisplayName(AS_MCSTR(account->name()), AS_MCSTR(account->emailAddress()));
+    Address * from = Address::addressWithMailbox(AS_MCSTR(account->emailAddress()));
 
     // NOTE: This method returns the account upon success but the client is not
     // reading the result. This function cannot mutate the account object.
