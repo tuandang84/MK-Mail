@@ -1,13 +1,12 @@
-// MK-Mail Outlook Classic theme v3 — tab bar + ribbon + search + pane styling
+// MK-Mail Outlook Classic theme v4 — Lucide icons, tab bar, search in ribbon
 :root {
   --mk-outlook-blue: #0078d4;
   --mk-outlook-blue-dark: #106ebe;
   --mk-outlook-border: #e1e1e1;
   --mk-outlook-bg: #ffffff;
-  --mk-outlook-bg-soft: #f3f2f1;
-  --mk-outlook-text: #333333;
-  --mk-outlook-text-dim: #666666;
-  --mk-ribbon-height: 96px;
+  --mk-outlook-text: #242424;
+  --mk-outlook-text-dim: #605e5c;
+  --mk-ribbon-height: 100px;
 }
 
 body {
@@ -61,24 +60,32 @@ body {
 .mk-ribbon-tabs {
   display: flex;
   align-items: center;
-  gap: 2px;
-  height: 28px;
-  padding: 0 8px;
+  gap: 4px;
+  height: 32px;
+  padding: 0 10px;
   border-bottom: 1px solid var(--mk-outlook-border);
   background: #fafafa;
   flex-shrink: 0;
+}
+
+.mk-ribbon-app-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mk-outlook-blue);
+  margin-right: 10px;
+  white-space: nowrap;
 }
 
 .mk-ribbon-tab {
   border: 1px solid transparent;
   border-bottom: none;
   background: transparent;
-  padding: 5px 14px;
-  font-size: 12px;
+  padding: 6px 14px;
+  font-size: 13px;
   color: var(--mk-outlook-text-dim);
   cursor: pointer;
   border-radius: 4px 4px 0 0;
-  height: 28px;
+  height: 32px;
 }
 
 .mk-ribbon-tab:hover {
@@ -107,7 +114,7 @@ body {
 .mk-ribbon {
   display: flex;
   align-items: stretch;
-  gap: 2px;
+  gap: 4px;
   height: 68px;
   padding: 6px 10px 8px 10px;
   background: var(--mk-outlook-bg);
@@ -132,9 +139,9 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0 8px;
+  padding: 0 6px;
   min-width: max-content;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #edebe9;
   border-radius: 4px;
   background: #fcfcfc;
 }
@@ -149,9 +156,9 @@ body {
   font-size: 10px;
   color: var(--mk-outlook-text-dim);
   text-align: center;
-  padding-top: 3px;
+  padding-top: 4px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .mk-ribbon-separator {
@@ -163,6 +170,7 @@ body {
 
 .mk-ribbon-spacer {
   flex: 1;
+  min-width: 8px;
 }
 
 .mk-ribbon-btn {
@@ -170,7 +178,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
   min-width: 68px;
   padding: 8px 10px;
   background: transparent;
@@ -179,26 +187,16 @@ body {
   cursor: pointer;
   color: var(--mk-outlook-text);
   font-size: 12px;
+  font-weight: 500;
   line-height: 1;
   flex-shrink: 0;
 }
 
-.mk-ribbon-btn img,
-.mk-ribbon-btn .retina-img,
-.mk-ribbon-btn .content-mask {
+.mk-ribbon-icon {
   width: 24px;
   height: 24px;
-  background-color: #222222;
-}
-
-.mk-ribbon-btn-primary img,
-.mk-ribbon-btn-primary .content-mask {
-  background-color: #ffffff;
-}
-
-.mk-ribbon-btn:disabled img,
-.mk-ribbon-btn:disabled .content-mask {
-  background-color: #777777 !important;
+  color: #242424;
+  flex-shrink: 0;
 }
 
 .mk-ribbon-btn:hover:not(:disabled) {
@@ -221,12 +219,8 @@ body {
   color: #555555;
 }
 
-.mk-ribbon-btn:disabled .content-mask {
-  background-color: #777777 !important;
-}
-
-.mk-ribbon-btn:disabled .mk-ribbon-label {
-  color: #555555;
+.mk-ribbon-btn:disabled .mk-ribbon-icon {
+  color: #777777;
 }
 
 .mk-ribbon-btn-primary {
@@ -234,6 +228,10 @@ body {
   color: #ffffff;
   border-color: var(--mk-outlook-blue-dark);
   font-weight: 600;
+}
+
+.mk-ribbon-btn-primary .mk-ribbon-icon {
+  color: #ffffff;
 }
 
 .mk-ribbon-btn-primary:hover:not(:disabled) {
@@ -245,12 +243,15 @@ body {
 .mk-ribbon-label {
   white-space: nowrap;
   font-size: 12px;
+  font-weight: 500;
 }
 
 .mk-ribbon-search-wrap {
   display: flex;
   align-items: center;
   padding: 0 8px;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .mk-ribbon-search {
@@ -260,16 +261,15 @@ body {
   border: 1px solid #a6a6a6;
   border-radius: 4px;
   background: #ffffff;
-  padding: 8px 10px;
-  min-width: 200px;
-  max-width: 280px;
+  padding: 9px 10px;
   width: 240px;
+  max-width: 280px;
   flex-shrink: 1;
 }
 
 .mk-ribbon-search:focus-within {
   border-color: var(--mk-outlook-blue);
-  background: #ffffff;
+  box-shadow: 0 0 0 1px var(--mk-outlook-blue);
 }
 
 .mk-ribbon-search-icon {
@@ -295,7 +295,6 @@ body {
   padding: 0 2px;
 }
 
-// Folder pane like Outlook Classic.
 .root-sidebar,
 .account-sidebar {
   background: #fafafa !important;
@@ -312,7 +311,6 @@ body {
   color: #666666;
 }
 
-// Thread list like Outlook: header + table rows.
 .thread-list {
   background: var(--mk-outlook-bg);
 }
@@ -333,7 +331,6 @@ body {
   font-weight: 600;
 }
 
-// Reading pane like Outlook Classic.
 .message-list {
   background: var(--mk-outlook-bg);
 }

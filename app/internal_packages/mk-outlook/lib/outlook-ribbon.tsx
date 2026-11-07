@@ -1,5 +1,4 @@
 import React from 'react';
-import { RetinaImg } from 'mailspring-component-kit';
 import {
   localized,
   Actions,
@@ -13,8 +12,114 @@ import { ListensToObservable } from 'mailspring-component-kit';
 
 type Props = { items?: ThreadType[] };
 
+type IconName =
+  | 'compose'
+  | 'reply'
+  | 'replyAll'
+  | 'forward'
+  | 'trash'
+  | 'archive'
+  | 'junk'
+  | 'move'
+  | 'markRead'
+  | 'print';
+
+// Lucide (https://lucide.dev) — MIT, widely used. Inline SVG so it works offline
+// and stays crisp at 24px, unlike the old grayscale mask PNGs that faded.
+const ICON_PATHS: Record<IconName, React.ReactNode> = {
+  compose: (
+    <>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </>
+  ),
+  reply: (
+    <>
+      <polyline points="9 17 4 12 9 7" />
+      <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+    </>
+  ),
+  replyAll: (
+    <>
+      <polyline points="11 17 6 12 11 7" />
+      <polyline points="18 17 13 12 18 7" />
+      <path d="M20 18v-2a4 4 0 0 0-4-4H6" />
+    </>
+  ),
+  forward: (
+    <>
+      <polyline points="15 3 21 9 15 15" />
+      <path d="M4 14v2a4 4 0 0 0 4 4h8" />
+      <path d="M21 9H9a4 4 0 0 0-4 4" />
+    </>
+  ),
+  trash: (
+    <>
+      <path d="M3 6h18" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <line x1="10" x2="10" y1="11" y2="17" />
+      <line x1="14" x2="14" y1="11" y2="17" />
+    </>
+  ),
+  archive: (
+    <>
+      <rect width="20" height="5" x="2" y="3" rx="1" />
+      <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+      <path d="M10 12h4" />
+    </>
+  ),
+  junk: (
+    <>
+      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+      <line x1="4" x2="20" y1="15" y2="15" />
+    </>
+  ),
+  move: (
+    <>
+      <polyline points="15 3 21 3 21 9" />
+      <polyline points="21 3 14 10" />
+      <line x1="21" x2="14" y1="3" y2="10" />
+      <polyline points="9 21 3 21 3 15" />
+      <line x1="3" x2="10" y1="21" y2="14" />
+    </>
+  ),
+  markRead: (
+    <>
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </>
+  ),
+  print: (
+    <>
+      <polyline points="6 9 6 2 18 2 18 9" />
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+      <rect width="12" height="8" x="6" y="14" />
+    </>
+  ),
+};
+
+function RibbonIcon({ name }: { name: IconName }) {
+  return (
+    <svg
+      className="mk-ribbon-icon"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {ICON_PATHS[name]}
+    </svg>
+  );
+}
+
 function RibbonButton(props: {
-  icon: string;
+  icon: IconName;
   label: string;
   onClick: (e: React.MouseEvent) => void;
   disabled?: boolean;
@@ -29,7 +134,7 @@ function RibbonButton(props: {
       aria-label={props.label}
       onClick={props.onClick}
     >
-      <RetinaImg name={props.icon} mode={RetinaImg.Mode.ContentIsMask} aria-hidden="true" />
+      <RibbonIcon name={props.icon} />
       <span className="mk-ribbon-label">{props.label}</span>
     </button>
   );
@@ -109,11 +214,11 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
   render() {
     const { tab } = this.state;
     const items = this.props.items || [];
-    const hasSelection = items.length > 0;
     const first: any = items[0];
     return (
       <div className="mk-ribbon-wrap">
         <div className="mk-ribbon-tabs">
+          <span className="mk-ribbon-app-title">MK-Mail</span>
           {TABS.map((t) => (
             <button
               key={t}
@@ -131,14 +236,12 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
                     : localized('Help')}
             </button>
           ))}
-          <div className="mk-ribbon-tabs-spacer" />
-          <span className="mk-ribbon-title">{localized('MK-Mail — Classic')}</span>
         </div>
         {tab === 'Home' && (
           <div className="mk-ribbon">
             <RibbonGroup title={localized('New')}>
               <RibbonButton
-                icon="toolbar-compose.png"
+                icon="compose"
                 label={localized('New Mail')}
                 primary
                 onClick={() => Actions.composeNewBlankDraft()}
@@ -147,7 +250,7 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
             <div className="mk-ribbon-separator" />
             <RibbonGroup title={localized('Respond')}>
               <RibbonButton
-                icon="toolbar-reply.png"
+                icon="reply"
                 label={localized('Reply')}
                 onClick={() =>
                   first &&
@@ -159,7 +262,7 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
                 }
               />
               <RibbonButton
-                icon="toolbar-reply-all.png"
+                icon="replyAll"
                 label={localized('Reply All')}
                 onClick={() =>
                   first &&
@@ -171,25 +274,21 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
                 }
               />
               <RibbonButton
-                icon="toolbar-forward.png"
+                icon="forward"
                 label={localized('Forward')}
                 onClick={() => first && Actions.composeForward({ thread: first } as any)}
               />
             </RibbonGroup>
             <div className="mk-ribbon-separator" />
             <RibbonGroup title={localized('Delete')}>
+              <RibbonButton icon="trash" label={localized('Delete')} onClick={() => trash(items)} />
               <RibbonButton
-                icon="toolbar-trash.png"
-                label={localized('Delete')}
-                onClick={() => trash(items)}
-              />
-              <RibbonButton
-                icon="toolbar-archive.png"
+                icon="archive"
                 label={localized('Archive')}
                 onClick={() => archive(items)}
               />
               <RibbonButton
-                icon="toolbar-spam.png"
+                icon="junk"
                 label={localized('Junk')}
                 onClick={() => {
                   if (!items.length) return;
@@ -205,12 +304,12 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
             <div className="mk-ribbon-separator" />
             <RibbonGroup title={localized('Move')}>
               <RibbonButton
-                icon="toolbar-movetofolder.png"
+                icon="move"
                 label={localized('Move to')}
                 onClick={() => archive(items)}
               />
               <RibbonButton
-                icon="toolbar-markasread.png"
+                icon="markRead"
                 label={localized('Mark Read')}
                 onClick={() => archive(items)}
               />
@@ -221,7 +320,7 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
             </div>
             <RibbonGroup title={localized('View')}>
               <RibbonButton
-                icon="print.png"
+                icon="print"
                 label={localized('Print')}
                 onClick={() => window.print()}
               />
