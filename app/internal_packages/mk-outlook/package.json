@@ -1,0 +1,12 @@
+{
+  "name": "mk-outlook",
+  "version": "0.1.0",
+  "main": "./lib/main",
+  "description": "MK-Mail Outlook Classic ribbon and theme",
+  "license": "GPL-3.0",
+  "private": true,
+  "syncInit": true,
+  "engines": {
+    "mailspring": "*"
+  }
+}

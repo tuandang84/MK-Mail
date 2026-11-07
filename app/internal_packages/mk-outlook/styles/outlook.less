@@ -1,0 +1,167 @@
+// MK-Mail Outlook Classic theme
+// Accent: Outlook blue #0078D4, Segoe UI, white panes with light borders.
+
+:root {
+  --mk-outlook-blue: #0078d4;
+  --mk-outlook-blue-dark: #106ebe;
+  --mk-outlook-border: #e1e1e1;
+  --mk-outlook-bg: #ffffff;
+  --mk-outlook-bg-soft: #f3f2f1;
+  --mk-outlook-text: #333333;
+}
+
+body {
+  font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, Arial, sans-serif !important;
+}
+
+// Top sheet toolbars look like an Outlook ribbon tab bar.
+.sheet-toolbar-container {
+  background: var(--mk-outlook-bg);
+  border-bottom: 1px solid var(--mk-outlook-border);
+}
+
+.sheet-toolbar-container .item-container {
+  align-items: stretch;
+  gap: 0;
+}
+
+// Ribbon bar (per-column segments that visually join into one ribbon).
+.mk-ribbon {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  height: 72px;
+  padding: 6px 8px 4px 8px;
+  background: var(--mk-outlook-bg);
+  border-bottom: 1px solid var(--mk-outlook-border);
+}
+
+.mk-ribbon-home {
+  height: 72px;
+}
+
+.mk-ribbon-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0 6px;
+  min-width: max-content;
+}
+
+.mk-ribbon-buttons {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  flex: 1;
+}
+
+.mk-ribbon-group-label {
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+  padding-top: 2px;
+  text-transform: none;
+}
+
+.mk-ribbon-separator {
+  width: 1px;
+  background: var(--mk-outlook-border);
+  margin: 4px 6px;
+}
+
+.mk-ribbon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 64px;
+  padding: 6px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--mk-outlook-text);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.mk-ribbon-btn img,
+.mk-ribbon-btn .retina-img {
+  width: 20px;
+  height: 20px;
+}
+
+.mk-ribbon-btn:hover:not(:disabled) {
+  background: #f3f6fb;
+  border-color: #d6e4f5;
+}
+
+.mk-ribbon-btn:active:not(:disabled) {
+  background: #e6f0fa;
+}
+
+.mk-ribbon-btn:disabled,
+.mk-ribbon-btn-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.mk-ribbon-btn-primary {
+  background: var(--mk-outlook-blue);
+  color: #ffffff;
+  border-color: var(--mk-outlook-blue-dark);
+  font-weight: 600;
+}
+
+.mk-ribbon-btn-primary:hover:not(:disabled) {
+  background: var(--mk-outlook-blue-dark);
+  border-color: var(--mk-outlook-blue-dark);
+  color: #ffffff;
+}
+
+.mk-ribbon-label {
+  white-space: nowrap;
+  max-width: 96px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Folder pane like Outlook Classic.
+.root-sidebar {
+  background: #fafafa !important;
+  border-right: 1px solid var(--mk-outlook-border);
+}
+
+.root-sidebar .section-heading,
+.root-sidebar .account-heading {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #666;
+}
+
+// Thread (mail) list like Outlook: table rows, white background.
+.thread-list {
+  background: var(--mk-outlook-bg);
+}
+
+.thread-list .thread {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.thread-list .thread.selected {
+  background: #eff6ff !important;
+  border-left: 3px solid var(--mk-outlook-blue);
+}
+
+// Reading pane like Outlook Classic.
+.message-list {
+  background: var(--mk-outlook-bg);
+}
+
+.message-header {
+  border-bottom: 1px solid var(--mk-outlook-border);
+  background: #ffffff;
+}
