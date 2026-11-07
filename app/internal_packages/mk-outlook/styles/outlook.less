@@ -18,6 +18,18 @@ body {
 .sheet-toolbar-container {
   background: var(--mk-outlook-bg);
   border-bottom: 1px solid var(--mk-outlook-border);
+  height: 64px !important;
+  min-height: 64px;
+  max-height: 64px;
+  -webkit-app-region: drag;
+}
+
+// Push the sheet content below the ribbon so buttons don't overlap the
+// folder pane, the mail list, or the reading pane (the main fix the user
+// asked for: "các cửa sổ giao diện nhảy xuống phía dưới thanh ribbon").
+.sheet {
+  padding-top: 64px;
+  box-sizing: border-box;
 }
 
 .sheet-toolbar-container .item-container {
@@ -44,15 +56,17 @@ body {
   display: flex;
   align-items: stretch;
   gap: 2px;
-  height: 56px;
-  padding: 4px 6px 2px 6px;
+  height: 64px;
+  padding: 4px 6px 6px 6px;
   background: var(--mk-outlook-bg);
   border-bottom: 1px solid var(--mk-outlook-border);
   overflow: hidden;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .mk-ribbon-home {
-  height: 56px;
+  height: 64px;
 }
 
 .mk-ribbon-group {
