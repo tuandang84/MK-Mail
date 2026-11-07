@@ -1010,9 +1010,14 @@ string exectuablePath = argv[0];
 #ifndef DEBUG
     // check path to executable in an obtuse way, prevent re-use of
     // Mailspring-Sync in products / forks not called Mailspring.
+    // MK-Mail fork: accept either upstream "mailspring" or product name
+    // "mk-mail" in the install path. Without this, mailsync exits with
+    // code 2 when installed to Program Files\MK-Mail (path has no
+    // "mailspring"), causing "An unknown error has occurred mailsync: 2".
     transform(exectuablePath.begin(), exectuablePath.end(), exectuablePath.begin(), ::tolower);
     string headerMessageId = string(USAGE_STRING).substr(59, 4) + string(USAGE_IDENTITY).substr(33, 6);
-    if (exectuablePath.find(headerMessageId) == string::npos) {
+    if (exectuablePath.find(headerMessageId) == string::npos &&
+        exectuablePath.find("mk-mail") == string::npos) {
         return 2;
     }
 #endif
