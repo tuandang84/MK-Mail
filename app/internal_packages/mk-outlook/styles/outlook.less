@@ -188,7 +188,7 @@ body {
 .mk-ribbon-btn .content-mask {
   width: 24px;
   height: 24px;
-  background-color: var(--mk-outlook-text);
+  background-color: #222222;
 }
 
 .mk-ribbon-btn-primary img,
@@ -198,7 +198,7 @@ body {
 
 .mk-ribbon-btn:disabled img,
 .mk-ribbon-btn:disabled .content-mask {
-  background-color: #999999;
+  background-color: #777777 !important;
 }
 
 .mk-ribbon-btn:hover:not(:disabled) {
@@ -216,8 +216,17 @@ body {
 }
 
 .mk-ribbon-btn:disabled {
-  opacity: 0.42;
+  opacity: 0.85;
   cursor: not-allowed;
+  color: #555555;
+}
+
+.mk-ribbon-btn:disabled .content-mask {
+  background-color: #777777 !important;
+}
+
+.mk-ribbon-btn:disabled .mk-ribbon-label {
+  color: #555555;
 }
 
 .mk-ribbon-btn-primary {
@@ -248,11 +257,14 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #c8c8c8;
+  border: 1px solid #a6a6a6;
   border-radius: 4px;
-  background: #f8f8f8;
-  padding: 6px 8px;
-  min-width: 220px;
+  background: #ffffff;
+  padding: 8px 10px;
+  min-width: 200px;
+  max-width: 280px;
+  width: 240px;
+  flex-shrink: 1;
 }
 
 .mk-ribbon-search:focus-within {
@@ -270,7 +282,8 @@ body {
   outline: none;
   background: transparent;
   font-size: 13px;
-  width: 180px;
+  width: 100%;
+  min-width: 0;
   color: var(--mk-outlook-text);
 }
 

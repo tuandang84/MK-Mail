@@ -149,22 +149,31 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
               <RibbonButton
                 icon="toolbar-reply.png"
                 label={localized('Reply')}
-                disabled={!hasSelection}
-                onClick={() => first && Actions.composeReply({ threadId: first.id })}
+                onClick={() =>
+                  first &&
+                  Actions.composeReply({
+                    thread: first,
+                    type: 'reply',
+                    behavior: 'prefer-existing-if-pristine',
+                  } as any)
+                }
               />
               <RibbonButton
                 icon="toolbar-reply-all.png"
                 label={localized('Reply All')}
-                disabled={!hasSelection}
                 onClick={() =>
-                  first && Actions.composeReply({ threadId: first.id, all: true } as any)
+                  first &&
+                  Actions.composeReply({
+                    thread: first,
+                    type: 'reply-all',
+                    behavior: 'prefer-existing-if-pristine',
+                  } as any)
                 }
               />
               <RibbonButton
                 icon="toolbar-forward.png"
                 label={localized('Forward')}
-                disabled={!hasSelection}
-                onClick={() => first && Actions.composeForward({ threadId: first.id } as any)}
+                onClick={() => first && Actions.composeForward({ thread: first } as any)}
               />
             </RibbonGroup>
             <div className="mk-ribbon-separator" />
@@ -172,19 +181,16 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
               <RibbonButton
                 icon="toolbar-trash.png"
                 label={localized('Delete')}
-                disabled={!hasSelection}
                 onClick={() => trash(items)}
               />
               <RibbonButton
                 icon="toolbar-archive.png"
                 label={localized('Archive')}
-                disabled={!hasSelection}
                 onClick={() => archive(items)}
               />
               <RibbonButton
                 icon="toolbar-spam.png"
                 label={localized('Junk')}
-                disabled={!hasSelection}
                 onClick={() => {
                   if (!items.length) return;
                   const tasks = TaskFactory.tasksForMarkingAsSpam({
@@ -201,13 +207,11 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
               <RibbonButton
                 icon="toolbar-movetofolder.png"
                 label={localized('Move to')}
-                disabled={!hasSelection}
                 onClick={() => archive(items)}
               />
               <RibbonButton
                 icon="toolbar-markasread.png"
                 label={localized('Mark Read')}
-                disabled={!hasSelection}
                 onClick={() => archive(items)}
               />
             </RibbonGroup>
@@ -217,9 +221,8 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
             </div>
             <RibbonGroup title={localized('View')}>
               <RibbonButton
-                icon="toolbar-print.png"
+                icon="print.png"
                 label={localized('Print')}
-                disabled={!hasSelection}
                 onClick={() => window.print()}
               />
             </RibbonGroup>
