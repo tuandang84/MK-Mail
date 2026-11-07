@@ -61,6 +61,7 @@ function trash(threads: ThreadType[]) {
 }
 
 // Folder pane ribbon (RootSidebar): big New Mail like Outlook Classic.
+// Only one New Mail here — the original ComposeButton is hidden via CSS.
 export class OutlookHomeRibbon extends React.Component {
   static displayName = 'OutlookHomeRibbon';
   render() {
@@ -74,20 +75,12 @@ export class OutlookHomeRibbon extends React.Component {
             onClick={() => Actions.composeNewBlankDraft()}
           />
         </RibbonGroup>
-        <div className="mk-ribbon-separator" />
-        <RibbonGroup title={localized('Home')}>
-          <RibbonButton
-            icon="toolbar-compose.png"
-            label={localized('New Mail')}
-            onClick={() => Actions.composeNewBlankDraft()}
-          />
-        </RibbonGroup>
       </div>
     );
   }
 }
 
-// Thread list ribbon (Outlook Home tab).
+// Thread list ribbon (Outlook Home tab — no duplicate New Mail, it lives in the folder pane).
 export class OutlookThreadRibbon extends React.Component<Props> {
   static displayName = 'OutlookThreadRibbon';
   render() {
@@ -96,15 +89,6 @@ export class OutlookThreadRibbon extends React.Component<Props> {
     const first: any = items[0];
     return (
       <div className="mk-ribbon">
-        <RibbonGroup title={localized('New')}>
-          <RibbonButton
-            icon="toolbar-compose.png"
-            label={localized('New Mail')}
-            primary
-            onClick={() => Actions.composeNewBlankDraft()}
-          />
-        </RibbonGroup>
-        <div className="mk-ribbon-separator" />
         <RibbonGroup title={localized('Respond')}>
           <RibbonButton
             icon="toolbar-reply.png"
