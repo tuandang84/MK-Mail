@@ -575,6 +575,14 @@ export async function finalizeAndValidateAccount(account: Account) {
   if (account.settings.smtp_port) {
     account.settings.smtp_port /= 1;
   }
+  // POP3 accounts have no imap_allow_insecure_ssl; ensure the POP3/SMTP
+  // flags exist as booleans so mailsync Account::valid() accepts them.
+  if ((account.settings as any).pop3_allow_insecure_ssl === undefined) {
+    (account.settings as any).pop3_allow_insecure_ssl = false;
+  }
+  if (account.settings.smtp_allow_insecure_ssl === undefined) {
+    account.settings.smtp_allow_insecure_ssl = false;
+  }
   if (account.label && account.label.includes('@')) {
     account.label = account.emailAddress;
   }

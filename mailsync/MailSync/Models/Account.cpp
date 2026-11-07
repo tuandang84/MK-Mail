@@ -48,6 +48,32 @@ string Account::valid() {
 
     json & s = _data["settings"];
 
+    // POP3 accounts have no IMAP settings at all. Requiring imap_* here
+    // made every POP3 onboarding fail with
+    // "Account is missing required fields:imap_password or refresh_token".
+    if (isPOP3()) {
+        if (!(s.count("refresh_token") || s.count("pop3_password"))) {
+            return "pop3_password or refresh_token";
+        }
+        if (!(s.count("refresh_token") || s.count("smtp_password"))) {
+            return "smtp_password or refresh_token";
+        }
+        // pop3_username is optional (defaults to the email address).
+        if (!(s.count("pop3_port") && s.count("pop3_host"))) {
+            return "pop3 configuration";
+        }
+        if (!(s.count("smtp_port") && s.count("smtp_host"))) {
+            return "smtp configuration";
+        }
+        if (s.count("pop3_allow_insecure_ssl") && !s["pop3_allow_insecure_ssl"].is_boolean()) {
+            return "pop3_allow_insecure_ssl";
+        }
+        if (!(s.count("smtp_allow_insecure_ssl") && s["smtp_allow_insecure_ssl"].is_boolean())) {
+            return "smtp_allow_insecure_ssl";
+        }
+        return ""; // true
+    }
+
     if (!(s.count("refresh_token") || s.count("imap_password"))) {
         return "imap_password or refresh_token";
     }
@@ -96,12 +122,15 @@ string Account::refreshClientId() {
 }
 
 unsigned int Account::IMAPPort() {
-    json & val = _data["settings"]["imap_port"];
+    json & s = _data["settings"];
+    if (!s.count("imap_port")) return 993;
+    json & val = s["imap_port"];
     return val.is_string() ? stoi(val.get<string>()) : val.get<unsigned int>();
 }
 
 string Account::IMAPHost() {
-    return _data["settings"]["imap_host"].get<string>();
+    json & s = _data["settings"];
+    return s.count("imap_host") ? s["imap_host"].get<string>() : "";
 }
 
 string Account::IMAPUsername() {
@@ -115,11 +144,13 @@ string Account::IMAPPassword() {
 }
 
 string Account::IMAPSecurity() {
-    return _data["settings"]["imap_security"].get<string>();
+    json & s = _data["settings"];
+    return s.count("imap_security") ? s["imap_security"].get<string>() : "SSL / TLS";
 }
 
 bool Account::IMAPAllowInsecureSSL() {
-    return _data["settings"]["imap_allow_insecure_ssl"].get<bool>();
+    json & s = _data["settings"];
+    return s.count("imap_allow_insecure_ssl") ? s["imap_allow_insecure_ssl"].get<bool>() : false;
 }
 
 bool Account::isPOP3() {
@@ -169,12 +200,15 @@ bool Account::isICloud() {
 }
 
 unsigned int Account::SMTPPort() {
-    json & val = _data["settings"]["smtp_port"];
+    json & s = _data["settings"];
+    if (!s.count("smtp_port")) return 587;
+    json & val = s["smtp_port"];
     return val.is_string() ? stoi(val.get<string>()) : val.get<unsigned int>();
 }
 
 string Account::SMTPHost() {
-    return _data["settings"]["smtp_host"].get<string>();
+    json & s = _data["settings"];
+    return s.count("smtp_host") ? s["smtp_host"].get<string>() : "";
 }
 
 string Account::SMTPUsername() {
@@ -188,11 +222,13 @@ string Account::SMTPPassword() {
 }
 
 string Account::SMTPSecurity() {
-    return _data["settings"]["smtp_security"].get<string>();
+    json & s = _data["settings"];
+    return s.count("smtp_security") ? s["smtp_security"].get<string>() : "STARTTLS";
 }
 
 bool Account::SMTPAllowInsecureSSL() {
-    return _data["settings"]["smtp_allow_insecure_ssl"].get<bool>();
+    json & s = _data["settings"];
+    return s.count("smtp_allow_insecure_ssl") ? s["smtp_allow_insecure_ssl"].get<bool>() : false;
 }
 
 string Account::SMTPVerification() {
