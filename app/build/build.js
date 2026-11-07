@@ -294,7 +294,8 @@ function buildPackagerOptions() {
           '*.so',
           '*.so.*',
           '*.dll',
-          '*.pdb',
+          // Slim MSI: '*.pdb' intentionally removed - PDBs are ignored
+          // above and must not be unpacked/shipped.
           '*.node',
           // Windows tray icons: Electron loads .ico via LoadImage, which needs a real
           // file on disk rather than a copy extracted from the asar on every change.
@@ -344,6 +345,12 @@ function buildPackagerOptions() {
       /\.mk/,
       /\.dYSM$/,
       /\.map$/,
+      // Slim MSI: debug/symbol artifacts bloat app.asar.unpacked (via
+      // asar unpack '*.pdb') and the WiX MSI cabinet. Crash-report PDBs
+      // are intentionally not shipped in the MK-Mail Release.
+      /\.pdb$/i,
+      /\.exp$/i,
+      /\.ilk$/i,
       // specific (large) module bits we know we don't need
       /node_modules[/]+less[/]+dist$/,
       /node_modules[/]+react[/]+dist$/,

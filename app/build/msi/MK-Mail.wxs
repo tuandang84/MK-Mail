@@ -14,7 +14,7 @@
              Description="MK-Mail for Windows x64 (POP3/IMAP/SMTP)" />
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of MK-Mail is already installed." AllowSameVersionUpgrades="yes" />
-    <MediaTemplate EmbedCab="yes" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
     <Icon Id="AppIcon" SourceFile="$(var.IconPath)" />
     <Property Id="ARPPRODUCTICON" Value="AppIcon" />

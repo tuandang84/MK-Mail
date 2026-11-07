@@ -56,12 +56,23 @@ jobs:
         run: |
           Write-Host "=== Deploying mailsync.exe and DLLs to app/ ==="
 
-          # 1. Copy Release build artifacts into app/
+          # 1. Copy only runtime binaries (exe + dll) from Release into app/.
+          # Previously Copy-Item Release\* also shipped .pdb/.exp/.lib/.ilk
+          # (~100 MB+) which electron-packager unpacks via asar '*.pdb'
+          # and WiX then packs into the MSI - see build.js ignore list.
           if (Test-Path ".\mailsync\Windows\Release") {
-            Copy-Item ".\mailsync\Windows\Release\*" -Destination ".\app" -Recurse -Force
+            Copy-Item ".\mailsync\Windows\Release\*.exe" -Destination ".\app" -Force -ErrorAction SilentlyContinue
+            Copy-Item ".\mailsync\Windows\Release\*.dll" -Destination ".\app" -Force -ErrorAction SilentlyContinue
           } else {
             Write-Host "ERROR: mailsync\Windows\Release not found!"
             exit 1
+          }
+          # Belt-and-braces: prune any debug artifacts that slipped in
+          $pruned = @(Get-ChildItem ".\app" -File -Include *.pdb,*.exp,*.lib,*.ilk,*.iobj,*.ipdb -ErrorAction SilentlyContinue)
+          if ($pruned.Count -gt 0) {
+            $prunedBytes = ($pruned | Measure-Object Length -Sum).Sum
+            Write-Host "Pruned $($pruned.Count) debug artifact(s) from app/ ($([math]::Round($prunedBytes/1MB,2)) MB)"
+            $pruned | Remove-Item -Force
           }
 
           if (-not (Test-Path ".\app\mailsync.exe")) {
@@ -102,10 +113,10 @@ jobs:
             }
           }
 
-          # 5. Copy UCRT DLLs
+          # 5. Copy UCRT DLLs (dlls only - avoid manifests etc)
           $ucrtPath = "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\x86"
           if (Test-Path $ucrtPath) {
-            Copy-Item "$ucrtPath\*" ".\app\" -Force -ErrorAction SilentlyContinue
+            Copy-Item "$ucrtPath\*.dll" ".\app\" -Force -ErrorAction SilentlyContinue
           }
 
           # 6. zlib naming workaround (vcpkg provides zlib1.dll, some imports expect zlib.dll)

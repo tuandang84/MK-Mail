@@ -96,6 +96,18 @@ $appFilesWxs = Join-Path $objDir "AppFiles.wxs"
 $mainWxs = Join-Path $scriptDir "MK-Mail.wxs"
 $finalMsi = Join-Path $OutputDir $MsiName
 
+# 4b. Slim: prune debug/symbol artifacts from the packaged folder before
+# harvesting, so they never end up in the MSI cabinet (this was the main
+# reason the first MSI was 309 MB).
+$debugFiles = Get-ChildItem -Path $SourceDir -Recurse -File -Include *.pdb,*.exp,*.lib,*.ilk,*.iobj,*.ipdb -ErrorAction SilentlyContinue
+if ($debugFiles) {
+    $prunedMB = [math]::Round(($debugFiles | Measure-Object Length -Sum).Sum / 1MB, 2)
+    Write-Host "Slim: removing $($debugFiles.Count) debug file(s) from package ($prunedMB MB)..."
+    $debugFiles | Remove-Item -Force -ErrorAction SilentlyContinue
+}
+$pkgSizeMB = [math]::Round((Get-ChildItem -Path $SourceDir -Recurse -File | Measure-Object Length -Sum).Sum / 1MB, 2)
+Write-Host "Package folder size before MSI: $pkgSizeMB MB"
+
 # 5. Harvest files using heat.exe
 Write-Host "Harvesting files with heat.exe..."
 & $heatExe dir "$SourceDir" -cg AppFiles -dr INSTALLFOLDER -scom -sreg -srd -sfrag -ag -var var.SourceDir -out "$appFilesWxs"
