@@ -66,13 +66,17 @@ class OnboardingStore extends MailspringStore {
       // switching environments.
       this._pageStack = ['account-choose'];
     } else if (hasAccounts) {
-      // Should only happen when the user has "signed out" of their Mailspring ID,
-      // but already has accounts synced. Or is upgrading from a very old build.
-      // We used to show "Welcome Back", but now just jump to sign in.
-      this._pageStack = ['authenticate'];
+      // No Mailspring ID but accounts already exist (signed out / upgrade).
+      // MK-Mail: skip the identity screens and go straight to the email-type
+      // picker instead of 'authenticate'.
+      this._pageStack = ['account-choose'];
     } else {
-      // Standard new user onboarding flow.
-      this._pageStack = ['welcome'];
+      // MK-Mail: new users go straight to "Connect an email account"
+      // (choose the email type / provider). The Welcome, Tutorial and
+      // Create-Mailspring-ID / Disable-Cloud-Features screens are skipped;
+      // the welcome/tutorial/authenticate pages remain in the codebase but
+      // are no longer part of the normal flow.
+      this._pageStack = ['account-choose'];
     }
   }
 
@@ -188,15 +192,9 @@ class OnboardingStore extends MailspringStore {
 
     AppEnv.displayWindow();
 
-    if (isFirstAccount) {
-      this._onMoveToPage('initial-preferences');
-    } else {
-      // let them see the "success" screen for a moment
-      // before the window is closed.
-      setTimeout(() => {
-        this._onOnboardingComplete();
-      }, 2000);
-    }
+    // MK-Mail: after adding an account go straight to the inbox - skip the
+    // initial preferences and Pro subscription upsell screens.
+    this._onOnboardingComplete();
   };
 
   page() {

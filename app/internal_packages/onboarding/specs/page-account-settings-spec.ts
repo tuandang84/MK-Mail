@@ -3,6 +3,8 @@ import { Account, AccountStore } from 'mailspring-exports';
 import * as OnboardingActions from '../lib/onboarding-actions';
 import { AccountBasicSettingsForm } from '../lib/page-account-settings';
 import AccountIMAPSettingsPage from '../lib/page-account-settings-imap';
+import { AccountPOP3SettingsForm } from '../lib/page-account-settings-pop3';
+import AccountPOP3SettingsPage from '../lib/page-account-settings-pop3';
 
 // Answers the implicit-TLS IMAP and submission SRV queries for `domain` with `target`.
 function stubSrvTarget(domain: string, target: string) {
@@ -110,5 +112,78 @@ describe('IMAP settings page', function imapSettingsPageTests() {
     page.onFieldChange({ target: { id: 'settings.smtp_host', value: '127.0.0.1' } });
     expect(page.state.account.settings.imap_certificate_sha256).toEqual('aa');
     expect(page.state.account.settings.smtp_certificate_sha256).toEqual('aa');
+  });
+});
+
+describe('POP3 settings page', function pop3SettingsPageTests() {
+  it('has a validateAccount so CreatePageForForm does not white-screen', () => {
+    expect(typeof (AccountPOP3SettingsForm as any).validateAccount).toBe('function');
+  });
+
+  it('reports not populated until name, email, password and both hosts are present', () => {
+    const account = new Account({
+      name: '',
+      emailAddress: '',
+      provider: 'pop3',
+      settings: {},
+    } as any);
+    const empty = (AccountPOP3SettingsForm as any).validateAccount(account);
+    expect(empty.populated).toBe(false);
+
+    const partial = new Account({
+      name: 'Test',
+      emailAddress: 'user@example.com',
+      provider: 'pop3',
+      settings: { pop3_password: 'secret' },
+    } as any);
+    expect((AccountPOP3SettingsForm as any).validateAccount(partial).populated).toBe(false);
+  });
+
+  it('reports populated with string ports and flags invalid ports', () => {
+    const account = new Account({
+      name: 'Test',
+      emailAddress: 'user@example.com',
+      provider: 'pop3',
+      settings: {
+        pop3_host: 'pop.example.com',
+        pop3_port: '995',
+        pop3_password: 'secret',
+        smtp_host: 'smtp.example.com',
+        smtp_port: '587',
+      },
+    } as any);
+    const valid = (AccountPOP3SettingsForm as any).validateAccount(account);
+    expect(valid.populated).toBe(true);
+    expect(valid.errorFieldNames).toEqual([]);
+
+    const badPort = new Account({
+      name: 'Test',
+      emailAddress: 'user@example.com',
+      provider: 'pop3',
+      settings: {
+        pop3_host: 'pop.example.com',
+        pop3_port: 'not-a-port',
+        pop3_password: 'secret',
+        smtp_host: 'smtp.example.com',
+        smtp_port: 587,
+      },
+    } as any);
+    const invalid = (AccountPOP3SettingsForm as any).validateAccount(badPort);
+    expect(invalid.errorFieldNames).toContain('settings.pop3_port');
+  });
+
+  it('constructs the composed page without throwing (regression: white screen)', () => {
+    const account = new Account({
+      name: 'Test',
+      emailAddress: 'user@example.com',
+      provider: 'pop3',
+      settings: { pop3_host: 'pop.example.com' },
+    } as any);
+    let page: any = null;
+    expect(() => {
+      page = new (AccountPOP3SettingsPage as any)({ account });
+    }).not.toThrow();
+    expect(page).not.toBe(null);
+    expect(page.state.account).not.toBe(null);
   });
 });

@@ -172,10 +172,10 @@ export function isHostInDomain(host: string, domain: string) {
   return normalized === base || normalized.endsWith(`.${base}`);
 }
 
-// The distinct IMAP and SMTP hosts that are not within the account's email domain.
+// The distinct POP3/IMAP and SMTP hosts that are not within the account's email domain.
 export function serversOutsideDomain(account: Account): string[] {
   const domain = account.emailAddress.split('@').pop();
-  const hosts = [account.settings.imap_host, account.settings.smtp_host]
+  const hosts = [account.settings.pop3_host, account.settings.imap_host, account.settings.smtp_host]
     .filter((host) => host && !isHostInDomain(host, domain))
     .map((host) => host.toLowerCase().replace(/\.$/, ''));
   return [...new Set(hosts)];
@@ -552,6 +552,9 @@ export async function finalizeAndValidateAccount(account: Account) {
   if (account.settings.imap_host) {
     account.settings.imap_host = account.settings.imap_host.trim();
   }
+  if ((account.settings as any).pop3_host) {
+    (account.settings as any).pop3_host = (account.settings as any).pop3_host.trim();
+  }
   if (account.settings.smtp_host) {
     account.settings.smtp_host = account.settings.smtp_host.trim();
   }
@@ -565,6 +568,9 @@ export async function finalizeAndValidateAccount(account: Account) {
 
   if (account.settings.imap_port) {
     account.settings.imap_port /= 1;
+  }
+  if ((account.settings as any).pop3_port) {
+    (account.settings as any).pop3_port /= 1;
   }
   if (account.settings.smtp_port) {
     account.settings.smtp_port /= 1;

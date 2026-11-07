@@ -20,7 +20,7 @@ interface AccountPOP3SettingsFormProps {
   onFieldKeyPress: () => void;
 }
 
-class AccountPOP3SettingsForm extends React.Component<AccountPOP3SettingsFormProps> {
+export class AccountPOP3SettingsForm extends React.Component<AccountPOP3SettingsFormProps> {
   static displayName = 'AccountPOP3SettingsForm';
 
   static submitLabel = () => {
@@ -35,29 +35,84 @@ class AccountPOP3SettingsForm extends React.Component<AccountPOP3SettingsFormPro
     return localized('Specify your POP3 and SMTP connection settings.');
   };
 
-  componentDidMount() {
-    const { account, onFieldChange } = this.props;
-    const { settings = {} } = account;
+  // Required by CreatePageForForm. Without this the decorator throws
+  // "FormComponent.validateAccount is not a function" in its constructor
+  // and the whole window goes white/frozen as soon as POP3 is picked.
+  static validateAccount = (account: Account) => {
+    const errorFieldNames: string[] = [];
+    let errorMessage: string | null = null;
+    const settings = (account.settings || {}) as Record<string, any>;
 
-    // Set default POP3/SMTP settings if empty
-    if (!settings.pop3_port) {
-      onFieldChange({ target: { id: 'settings.pop3_port', value: 995 } });
+    // Basic identity fields (the POP3 page is reached directly from the
+    // provider picker, not via the generic basic form).
+    if (!account.emailAddress || !account.name) {
+      return { errorMessage, errorFieldNames, populated: false };
     }
-    if (!settings.pop3_security) {
-      onFieldChange({ target: { id: 'settings.pop3_security', value: 'SSL / TLS' } });
+
+    // POP3 username defaults to the email address in the sync engine, but
+    // the password is mandatory. SMTP auth is optional on some gateways.
+    if (!settings.pop3_password) {
+      return { errorMessage, errorFieldNames, populated: false };
     }
-    if (!settings.smtp_port) {
-      onFieldChange({ target: { id: 'settings.smtp_port', value: 587 } });
+
+    for (const type of ['pop3', 'smtp']) {
+      if (!settings[`${type}_host`]) {
+        return { errorMessage, errorFieldNames, populated: false };
+      }
+      const port = settings[`${type}_port`];
+      // Ports may arrive as strings from <input type="number">. 0 is the
+      // "Custom" placeholder value in the dropdown, not a real port.
+      if (
+        port === undefined ||
+        port === null ||
+        port === '' ||
+        !Number.isFinite(Number(port)) ||
+        Number(port) <= 0
+      ) {
+        errorMessage = localized('Please provide a valid port number.');
+        errorFieldNames.push(`settings.${type}_port`);
+      }
     }
-    if (!settings.smtp_security) {
-      onFieldChange({ target: { id: 'settings.smtp_security', value: 'STARTTLS' } });
+
+    // Non-empty email is already guaranteed above; still flag malformed ones
+    // so the user gets feedback instead of a server-side auth failure.
+    if (account.emailAddress && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(account.emailAddress)) {
+      errorMessage = localized('Please provide a valid email address.');
+      errorFieldNames.push('emailAddress');
     }
-    if (!settings.pop3_username && account.emailAddress) {
-      onFieldChange({ target: { id: 'settings.pop3_username', value: account.emailAddress } });
-    }
-    if (!settings.smtp_username && account.emailAddress) {
-      onFieldChange({ target: { id: 'settings.smtp_username', value: account.emailAddress } });
-    }
+
+    return { errorMessage, errorFieldNames, populated: true };
+  };
+
+  componentDidMount() {
+    ipcRenderer.send('resize-window', { width: 900, height: 660 });
+    const { account, onFieldChange } = this.props;
+    const settings = (account.settings || {}) as Record<string, any>;
+
+    // Set default POP3/SMTP settings if empty. They must be applied in
+    // sequence via afterSetState: calling onFieldChange repeatedly in a
+    // loop would clone the *same* stale state each time and every default
+    // but the last one would be lost (and the UI would flicker/freeze).
+    const defaults: Array<{ id: string; value: any }> = [];
+    if (!settings.pop3_port) defaults.push({ id: 'settings.pop3_port', value: 995 });
+    if (!settings.pop3_security)
+      defaults.push({ id: 'settings.pop3_security', value: 'SSL / TLS' });
+    if (!settings.smtp_port) defaults.push({ id: 'settings.smtp_port', value: 587 });
+    if (!settings.smtp_security) defaults.push({ id: 'settings.smtp_security', value: 'STARTTLS' });
+    if (!settings.pop3_username && account.emailAddress)
+      defaults.push({ id: 'settings.pop3_username', value: account.emailAddress });
+    if (!settings.smtp_username && account.emailAddress)
+      defaults.push({ id: 'settings.smtp_username', value: account.emailAddress });
+
+    const applyNext = (index: number) => {
+      if (index >= defaults.length) return;
+      const d = defaults[index];
+      onFieldChange(
+        { target: { id: d.id, value: d.value } },
+        { afterSetState: () => applyNext(index + 1) }
+      );
+    };
+    applyNext(0);
   }
 
   renderConnectionSection(protocol: 'pop3' | 'smtp') {
@@ -103,20 +158,35 @@ class AccountPOP3SettingsForm extends React.Component<AccountPOP3SettingsFormPro
     return (
       <div className="section">
         <span className="section-title">
-          {protocol === 'pop3' ? localized('Incoming Mail (POP3)') : localized('Outgoing Mail (SMTP)')}
+          {protocol === 'pop3'
+            ? localized('Incoming Mail (POP3)')
+            : localized('Outgoing Mail (SMTP)')}
         </span>
-        <FormField field={`settings.${protocol}_host`} title={localized('Server')} {...this.props} />
         <FormField
-          field={`settings.${protocol}_port`}
-          title={localized('Port')}
-          type="select"
-          onChange={onPortChange}
-          values={[
-            ...values.map((v) => ({ label: `${v}`, value: v })),
-            { label: localized('Custom'), value: '0' },
-          ]}
+          field={`settings.${protocol}_host`}
+          title={localized('Server')}
           {...this.props}
         />
+        <span>
+          <label htmlFor={`settings.${field}`}>{localized('Port')}:</label>
+          <select
+            id={`settings.${field}`}
+            tabIndex={0}
+            value={isStandard ? settings[field] : 0}
+            disabled={submitting}
+            onKeyPress={onFieldKeyPress}
+            onChange={onPortChange}
+          >
+            {values.map((v) => (
+              <option value={v} key={v}>
+                {v}
+              </option>
+            ))}
+            <option value={0} key="custom">
+              {localized('Custom')}
+            </option>
+          </select>
+        </span>
         {!isStandard && (
           <FormField
             field={`settings.${protocol}_port`}
@@ -129,7 +199,9 @@ class AccountPOP3SettingsForm extends React.Component<AccountPOP3SettingsFormPro
           <select
             id={`settings.${protocol}_security`}
             tabIndex={0}
-            value={settings[`${protocol}_security`] || (protocol === 'pop3' ? 'SSL / TLS' : 'STARTTLS')}
+            value={
+              settings[`${protocol}_security`] || (protocol === 'pop3' ? 'SSL / TLS' : 'STARTTLS')
+            }
             disabled={submitting}
             onKeyPress={onFieldKeyPress}
             onChange={onFieldChange}

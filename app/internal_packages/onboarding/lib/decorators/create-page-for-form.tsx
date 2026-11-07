@@ -32,13 +32,19 @@ const CreatePageForForm = (FormComponent: React.ComponentType<any> & Record<stri
     constructor(props) {
       super(props);
 
+      const validation = (FormComponent as any).validateAccount?.(this.props.account) ?? {
+        errorMessage: null,
+        errorFieldNames: [],
+        populated: true,
+      };
+
       this.state = Object.assign(
         {
           account: this.props.account.clone(),
           errorFieldNames: [],
           errorMessage: null,
         },
-        FormComponent.validateAccount(this.props.account)
+        validation
       );
     }
 
@@ -93,6 +99,7 @@ const CreatePageForForm = (FormComponent: React.ComponentType<any> & Record<stri
 
       if (event.target.id.includes('.')) {
         const [parent, key] = event.target.id.split('.');
+        if (!next[parent]) next[parent] = {};
         if (parent === 'settings' && next.settings[key] !== val) {
           forgetCertificateIfServerChanged(next, key);
         }
@@ -101,7 +108,11 @@ const CreatePageForForm = (FormComponent: React.ComponentType<any> & Record<stri
         next[event.target.id] = val;
       }
 
-      const { errorFieldNames, errorMessage, populated } = FormComponent.validateAccount(next);
+      const {
+        errorFieldNames = [],
+        errorMessage = null,
+        populated = true,
+      } = (FormComponent as any).validateAccount?.(next) ?? {};
 
       this.setState(
         {
