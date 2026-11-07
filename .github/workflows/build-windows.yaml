@@ -168,11 +168,37 @@ jobs:
         run: |
           & .\app\build\msi\create-msi.ps1
 
+      - name: Build Portable ZIP (no installer)
+        shell: pwsh
+        run: |
+          $src = "app\dist\mailspring-win32-x64"
+          $zip = "app\dist\MK-Mail-Portable-x64.zip"
+          if (-not (Test-Path $src)) {
+            Write-Error "Portable source not found: $src"
+            exit 1
+          }
+          Write-Host "=== Creating portable ZIP from $src ==="
+          if (Test-Path $zip) { Remove-Item $zip -Force }
+          Compress-Archive -Path "$src\*" -DestinationPath $zip -CompressionLevel Optimal
+          $sizeMB = [math]::Round((Get-Item $zip).Length / 1MB, 2)
+          Write-Host "Portable ZIP: $zip ($sizeMB MB)"
+          # Portable test shortcut note: extract anywhere and launch MK-Mail.exe (Mailspring.exe).
+          # mailsync path check accepts mk-mail/mailspring, and portable folder name contains both.
+          $srcSizeMB = [math]::Round((Get-ChildItem $src -Recurse -File | Measure-Object Length -Sum).Sum / 1MB, 2)
+          Write-Host "Portable source size: $srcSizeMB MB"
+
       - name: Upload MSI Artifact
         uses: actions/upload-artifact@v4
         with:
           name: MK-Mail-Setup-x64-msi
           path: app/dist/MK-Mail-Setup-x64.msi
+          if-no-files-found: error
+
+      - name: Upload Portable Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MK-Mail-Portable-x64-zip
+          path: app/dist/MK-Mail-Portable-x64.zip
           if-no-files-found: error
 
       - name: Create GitHub Release
@@ -191,8 +217,10 @@ jobs:
             - **Modern POP3 Setup UI**: Direct POP3 account setup form & provider option in Mailspring onboarding.
 
             ### Downloads:
-            - **`MK-Mail-Setup-x64.msi`**: Official Windows x64 MSI Installer.
+            - **`MK-Mail-Setup-x64.msi`**: Official Windows x64 MSI Installer (needs Admin, keeps shortcut desktop).
+            - **`MK-Mail-Portable-x64.zip`**: Portable ZIP — giải nén là chạy, không cần Admin, không cần gỡ bản cũ. Chạy `Mailspring.exe` sau khi giải nén.
           files: |
             app/dist/MK-Mail-Setup-x64.msi
+            app/dist/MK-Mail-Portable-x64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
