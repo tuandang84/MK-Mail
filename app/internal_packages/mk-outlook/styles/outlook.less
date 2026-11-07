@@ -1,79 +1,79 @@
-// MK-Mail Outlook Classic theme
-// Accent: Outlook blue #0078D4, Segoe UI, white panes with light borders.
-
+// MK-Mail Outlook Classic theme v2 — single full-width ribbon
 :root {
   --mk-outlook-blue: #0078d4;
   --mk-outlook-blue-dark: #106ebe;
   --mk-outlook-border: #e1e1e1;
   --mk-outlook-bg: #ffffff;
-  --mk-outlook-bg-soft: #f3f2f1;
   --mk-outlook-text: #333333;
+  --mk-ribbon-height: 68px;
 }
 
 body {
   font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, Arial, sans-serif !important;
 }
 
-// Top sheet toolbars look like an Outlook ribbon tab bar.
+// Fixed ribbon bar height; sheet content is pushed below it.
 .sheet-toolbar-container {
   background: var(--mk-outlook-bg);
   border-bottom: 1px solid var(--mk-outlook-border);
-  height: 64px !important;
-  min-height: 64px;
-  max-height: 64px;
+  height: var(--mk-ribbon-height) !important;
+  min-height: var(--mk-ribbon-height);
+  max-height: var(--mk-ribbon-height);
+  overflow: hidden;
   -webkit-app-region: drag;
-}
-
-// Push the sheet content below the ribbon so buttons don't overlap the
-// folder pane, the mail list, or the reading pane (the main fix the user
-// asked for: "các cửa sổ giao diện nhảy xuống phía dưới thanh ribbon").
-.sheet {
-  padding-top: 64px;
-  box-sizing: border-box;
 }
 
 .sheet-toolbar-container .item-container {
   align-items: stretch;
   gap: 0;
+  height: 100%;
 }
 
-// Hide original duplicate buttons — our Ribbon is the single source.
+// Stretch the first toolbar column to full window width so the global
+// ribbon spans all panes like Outlook Classic (instead of being chopped).
+.sheet-toolbar-container [data-column='0'] {
+  left: 0 !important;
+  width: 100% !important;
+}
+
+// Hide original duplicate buttons — Ribbon is the single source.
+.sheet-toolbar-container .item-compose,
 .toolbar-RootSidebar .btn-toolbar.NewItemButton,
 .toolbar-RootSidebar [data-role='ComposeButton'],
-.sheet-toolbar-container .NewItemButton {
-  display: none !important;
-}
-
-// Hide original per-column duplicate action buttons that our Ribbon replaces
-// (Multiselect + injected Archive/Trash etc.) to avoid overlap with our groups.
 .toolbar-ThreadList .multiselect-toolbar,
 .toolbar-MessageList .message-toolbar-items {
   display: none !important;
 }
 
-// Ribbon bar (per-column segments that visually join into one ribbon).
+// Push sheet content below ribbon.
+.sheet {
+  padding-top: var(--mk-ribbon-height);
+  box-sizing: border-box;
+}
+
 .mk-ribbon {
   display: flex;
   align-items: stretch;
   gap: 2px;
-  height: 64px;
-  padding: 4px 6px 6px 6px;
+  height: var(--mk-ribbon-height);
+  padding: 6px 10px 8px 10px;
   background: var(--mk-outlook-bg);
-  border-bottom: 1px solid var(--mk-outlook-border);
   overflow: hidden;
   flex-wrap: nowrap;
   white-space: nowrap;
+  width: 100%;
+  -webkit-app-region: no-drag;
 }
 
-.mk-ribbon-home {
-  height: 64px;
+.mk-ribbon-global {
+  width: 100%;
 }
 
 .mk-ribbon-group {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0 4px;
+  padding: 0 6px;
   min-width: max-content;
 }
 
@@ -85,17 +85,21 @@ body {
 }
 
 .mk-ribbon-group-label {
-  font-size: 10px;
+  font-size: 11px;
   color: #666;
   text-align: center;
-  padding-top: 1px;
-  text-transform: none;
+  padding-top: 3px;
 }
 
 .mk-ribbon-separator {
   width: 1px;
   background: var(--mk-outlook-border);
-  margin: 2px 4px;
+  margin: 4px 8px;
+  flex-shrink: 0;
+}
+
+.mk-ribbon-spacer {
+  flex: 1;
 }
 
 .mk-ribbon-btn {
@@ -103,16 +107,17 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  min-width: 56px;
-  padding: 4px 6px;
+  gap: 4px;
+  min-width: 64px;
+  padding: 6px 8px;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 4px;
   cursor: pointer;
   color: var(--mk-outlook-text);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .mk-ribbon-btn img,
@@ -130,8 +135,7 @@ body {
   background: #e6f0fa;
 }
 
-.mk-ribbon-btn:disabled,
-.mk-ribbon-btn-disabled {
+.mk-ribbon-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
@@ -151,9 +155,6 @@ body {
 
 .mk-ribbon-label {
   white-space: nowrap;
-  max-width: 96px;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 // Folder pane like Outlook Classic.
@@ -162,16 +163,7 @@ body {
   border-right: 1px solid var(--mk-outlook-border);
 }
 
-.root-sidebar .section-heading,
-.root-sidebar .account-heading {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #666;
-}
-
-// Thread (mail) list like Outlook: table rows, white background.
+// Thread list like Outlook.
 .thread-list {
   background: var(--mk-outlook-bg);
 }

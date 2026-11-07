@@ -1,5 +1,5 @@
 import React from 'react';
-import { RetinaImg, ListensToObservable } from 'mailspring-component-kit';
+import { RetinaImg } from 'mailspring-component-kit';
 import {
   localized,
   Actions,
@@ -9,6 +9,7 @@ import {
   Thread as ThreadType,
   Rx,
 } from 'mailspring-exports';
+import { ListensToObservable } from 'mailspring-component-kit';
 
 type Props = { items?: ThreadType[] };
 
@@ -22,11 +23,11 @@ function RibbonButton(props: {
   return (
     <button
       tabIndex={-1}
-      className={`mk-ribbon-btn${props.primary ? ' mk-ribbon-btn-primary' : ''}${props.disabled ? ' mk-ribbon-btn-disabled' : ''}`}
+      disabled={props.disabled}
+      className={`mk-ribbon-btn${props.primary ? ' mk-ribbon-btn-primary' : ''}`}
       title={props.label}
       aria-label={props.label}
       onClick={props.onClick}
-      disabled={props.disabled}
     >
       <RetinaImg name={props.icon} mode={RetinaImg.Mode.ContentIsMask} aria-hidden="true" />
       <span className="mk-ribbon-label">{props.label}</span>
@@ -60,13 +61,17 @@ function trash(threads: ThreadType[]) {
   Actions.popSheet();
 }
 
-// Folder pane ribbon (RootSidebar): big New Mail like Outlook Classic.
-// Only one New Mail here — the original ComposeButton is hidden via CSS.
-export class OutlookHomeRibbon extends React.Component {
-  static displayName = 'OutlookHomeRibbon';
+// Single full-width Outlook Classic ribbon (Home tab).
+// Registered once at the Global toolbar so it spans all columns instead of
+// being chopped into narrow per-column segments.
+export class OutlookGlobalRibbon extends React.Component<Props> {
+  static displayName = 'OutlookGlobalRibbon';
   render() {
+    const items = this.props.items || [];
+    const hasSelection = items.length > 0;
+    const first: any = items[0];
     return (
-      <div className="mk-ribbon mk-ribbon-home">
+      <div className="mk-ribbon mk-ribbon-global">
         <RibbonGroup title={localized('New')}>
           <RibbonButton
             icon="toolbar-compose.png"
@@ -75,20 +80,7 @@ export class OutlookHomeRibbon extends React.Component {
             onClick={() => Actions.composeNewBlankDraft()}
           />
         </RibbonGroup>
-      </div>
-    );
-  }
-}
-
-// Thread list ribbon (Outlook Home tab — no duplicate New Mail, it lives in the folder pane).
-export class OutlookThreadRibbon extends React.Component<Props> {
-  static displayName = 'OutlookThreadRibbon';
-  render() {
-    const items = this.props.items || [];
-    const hasSelection = items.length > 0;
-    const first: any = items[0];
-    return (
-      <div className="mk-ribbon">
+        <div className="mk-ribbon-separator" />
         <RibbonGroup title={localized('Respond')}>
           <RibbonButton
             icon="toolbar-reply.png"
@@ -146,49 +138,15 @@ export class OutlookThreadRibbon extends React.Component<Props> {
             disabled={!hasSelection}
             onClick={() => archive(items)}
           />
-        </RibbonGroup>
-      </div>
-    );
-  }
-}
-
-// Reading pane ribbon.
-export class OutlookMessageRibbon extends React.Component<Props> {
-  static displayName = 'OutlookMessageRibbon';
-  render() {
-    const items = this.props.items || [];
-    const hasSelection = items.length > 0;
-    const first: any = items[0];
-    return (
-      <div className="mk-ribbon">
-        <RibbonGroup title={localized('Respond')}>
           <RibbonButton
-            icon="toolbar-reply.png"
-            label={localized('Reply')}
-            disabled={!hasSelection}
-            onClick={() => first && Actions.composeReply({ threadId: first.id })}
-          />
-          <RibbonButton
-            icon="toolbar-forward.png"
-            label={localized('Forward')}
-            disabled={!hasSelection}
-            onClick={() => first && Actions.composeForward({ threadId: first.id } as any)}
-          />
-        </RibbonGroup>
-        <div className="mk-ribbon-separator" />
-        <RibbonGroup title={localized('Actions')}>
-          <RibbonButton
-            icon="toolbar-trash.png"
-            label={localized('Delete')}
-            disabled={!hasSelection}
-            onClick={() => trash(items)}
-          />
-          <RibbonButton
-            icon="toolbar-archive.png"
-            label={localized('Archive')}
+            icon="toolbar-markasread.png"
+            label={localized('Mark Read')}
             disabled={!hasSelection}
             onClick={() => archive(items)}
           />
+        </RibbonGroup>
+        <div className="mk-ribbon-spacer" />
+        <RibbonGroup title={localized('View')}>
           <RibbonButton
             icon="toolbar-print.png"
             label={localized('Print')}
@@ -212,14 +170,8 @@ function getState(items: ThreadType[]) {
   return { items: items || [] };
 }
 
-export const OutlookThreadRibbonApp: any = ListensToObservable(OutlookThreadRibbon, {
+export const OutlookGlobalRibbonApp: any = ListensToObservable(OutlookGlobalRibbon, {
   getObservable: collectionObservable,
   getStateFromObservable: getState,
 });
-OutlookThreadRibbonApp.displayName = 'OutlookThreadRibbon';
-
-export const OutlookMessageRibbonApp: any = ListensToObservable(OutlookMessageRibbon, {
-  getObservable: collectionObservable,
-  getStateFromObservable: getState,
-});
-OutlookMessageRibbonApp.displayName = 'OutlookMessageRibbon';
+OutlookGlobalRibbonApp.displayName = 'OutlookGlobalRibbon';
