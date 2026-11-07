@@ -127,13 +127,13 @@ export default class Application extends EventEmitter {
       let buttons = [localized('Quit')];
       if (err.toString().includes('ENOENT')) {
         message = localized(
-          `Mailspring could not find the mailsync process. If you're building Mailspring from source, make sure mailsync.tar.gz has been downloaded and unpacked in your working copy.`
+          `MK-Mail could not find the mailsync process. If you're building MK-Mail from source, make sure mailsync.tar.gz has been downloaded and unpacked in your working copy.`
         );
       } else if (err.toString().includes('spawn')) {
-        message = localized(`Mailspring could not spawn the mailsync process. %@`, err.toString());
+        message = localized(`MK-Mail could not spawn the mailsync process. %@`, err.toString());
       } else {
         message = localized(
-          `We encountered a problem with your local email database. %@\n\nCheck that no other copies of Mailspring are running and click Rebuild to reset your local cache.`,
+          `We encountered a problem with your local email database. %@\n\nCheck that no other copies of MK-Mail are running and click Rebuild to reset your local cache.`,
           err.toString()
         );
         buttons = [localized('Quit'), localized('Rebuild')];
@@ -356,7 +356,7 @@ export default class Application extends EventEmitter {
     if (hasAccount) {
       this.windowManager.ensureWindow(WindowManager.MAIN_WINDOW, {}, behavior);
     } else {
-      const title = localized('Welcome to Mailspring');
+      const title = localized('Welcome to MK-Mail');
       this.windowManager.ensureWindow(WindowManager.ONBOARDING_WINDOW, { title }, behavior);
     }
   }
@@ -445,7 +445,7 @@ export default class Application extends EventEmitter {
         onboarding.focus();
       } else {
         this.windowManager.ensureWindow(WindowManager.ONBOARDING_WINDOW, {
-          title: localized('Welcome to Mailspring'),
+          title: localized('Welcome to MK-Mail'),
           windowProps: {},
         });
       }
@@ -503,17 +503,17 @@ export default class Application extends EventEmitter {
     });
 
     this.on('application:view-help', () => {
-      const helpUrl = 'https://getmailspring.com/docs/';
+      const helpUrl = 'https://github.com/tuandang84/MK-Mail#mk-mail';
       shell.openExternal(helpUrl);
     });
 
     this.on('application:view-getting-started', () => {
-      const helpUrl = 'https://community.getmailspring.com/pub/quick-start-guide';
+      const helpUrl = 'https://github.com/tuandang84/MK-Mail';
       shell.openExternal(helpUrl);
     });
 
     this.on('application:view-community', () => {
-      const helpUrl = 'https://community.getmailspring.com/';
+      const helpUrl = 'https://github.com/tuandang84/MK-Mail/issues';
       shell.openExternal(helpUrl);
     });
 

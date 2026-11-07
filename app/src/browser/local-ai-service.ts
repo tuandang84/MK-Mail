@@ -287,6 +287,12 @@ class LocalAIService {
   }
 
   private ensureWorker(): Promise<{ gpu: string }> {
+    // Slim MK-Mail: Local AI binaries are not shipped (see build.js ignore).
+    // Keep the API surface so existing callers degrade gracefully.
+    return Promise.reject(new Error('Local AI is not included in MK-Mail slim build.'));
+  }
+
+  private ensureWorkerOriginal(): Promise<{ gpu: string }> {
     if (this.workerReady) return this.workerReady;
     const modelPath = this.model.modelPath();
     if (!modelPath) return Promise.reject(new Error('The local model is not downloaded.'));

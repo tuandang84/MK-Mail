@@ -301,14 +301,12 @@ function buildPackagerOptions() {
           // file on disk rather than a copy extracted from the asar on every change.
           '*.ico',
           '**/vendor/**',
-          '**/src/tasks/**',
+           '**/src/tasks/**',
           '**/src/quickpreview/**',
           '**/mcp-stdio-bridge.js',
-          // Local AI (src/browser/local-ai-service.ts) runs node-llama-cpp in a
-          // utility process. It is ESM with native binaries, so the worker, the package and
-          // everything it imports live on disk and are imported from app.asar.unpacked.
-          '**/src/browser/local-ai-worker.js',
-          ...dependencyClosure('node-llama-cpp').map((dir) => `**/node_modules/${dir}/**`),
+          // Slim MK-Mail: Local AI (node-llama-cpp) is huge (~100MB+) and not
+          // needed for core mail. Keep worker file only; native binaries are
+          // ignored below so the app can still run without Local AI.
           '**/static/all_licenses.html',
           '**/static/extensions/**',
           '**/node_modules/spellchecker/**',
@@ -357,6 +355,11 @@ function buildPackagerOptions() {
       /node_modules[/].*[/]tests?$/,
       /node_modules[/].*[/]coverage$/,
       /node_modules[/].*[/]benchmark$/,
+      // Slim MK-Mail: drop Local AI native binaries (largest payload) and
+      // heavy preview/vendor files not needed for core POP3 mail.
+      /node_modules[/]+@node-llama-cpp/,
+      /node_modules[/]+node-llama-cpp/,
+      /node_modules[/]+pdfjs-dist/,
       nodeLlamaCppBinariesToIgnore(),
     ],
     out: outputDir,

@@ -117,7 +117,7 @@ export default class MailspringWindow extends EventEmitter {
     type GetConstructorArgs<T> = T extends new (options: infer U) => any ? U : never;
     const browserWindowOptions: GetConstructorArgs<typeof BrowserWindow> = {
       show: false,
-      title: title || 'Mailspring',
+      title: title || 'MK-Mail',
       frame,
       width,
       height,
@@ -394,7 +394,7 @@ export default class MailspringWindow extends EventEmitter {
       const chosen = dialog.showMessageBoxSync(this.browserWindow, {
         type: 'warning',
         buttons: ['Close', 'Keep Waiting'],
-        message: 'Mailspring is not responding',
+        message: 'MK-Mail is not responding',
         detail: 'Would you like to force close it or keep waiting?',
       });
       if (chosen === 0) {
@@ -439,8 +439,8 @@ export default class MailspringWindow extends EventEmitter {
         const chosen = dialog.showMessageBoxSync({
           type: 'warning',
           buttons: ['Close Window', 'Reload', 'Keep It Open'],
-          message: 'Mailspring has crashed',
-          detail: 'Please report this issue to us at support@getmailspring.com.',
+          message: 'MK-Mail has crashed',
+          detail: 'Please report this issue to us at https://github.com/tuandang84/MK-Mail/issues.',
         });
         if (chosen === 0) {
           this.browserWindow.destroy();

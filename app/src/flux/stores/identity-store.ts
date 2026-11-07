@@ -89,6 +89,10 @@ class _IdentityStore extends MailspringStore {
 
   _fetchAndPollRemoteIdentity() {
     if (!AppEnv.isMainWindow()) return;
+    // Slim MK-Mail: MK-Mail has no Mailspring cloud identity. Polling
+    // id.getmailspring.com every 10 min wastes RAM/CPU and network for a
+    // POP3-only client, so skip it entirely unless the user has an identity.
+    if (!this._identity) return;
     const poll = () => {
       // fetchIdentity can still reject for reasons other than the network request
       // itself (eg saveIdentity's keychain/config writes) - catch here too so a
