@@ -160,9 +160,9 @@ module.exports = ErrorLogger = (function () {
       return;
     }
     require('electron').crashReporter.start({
-      productName: 'Mailspring',
-      companyName: 'Mailspring',
-      submitURL: `https://id.getmailspring.com/report-crash?ver=${appVersion}&platform=${process.platform}`,
+      productName: 'MK-Mail',
+      companyName: 'MK-Mail',
+      submitURL: `https://github.com/tuandang84/MK-Mail/issues`,
       uploadToServer: true,
       autoSubmit: true,
       extra: {

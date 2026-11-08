@@ -135,9 +135,9 @@ export default class AppEnvConstructor {
     const MailsyncBridge = require('./flux/mailsync-bridge').default;
     this.mailsyncBridge = new MailsyncBridge();
 
-    process.title = `Mailspring ${this.getWindowType()}`;
+    process.title = `MK-Mail ${this.getWindowType()}`;
     this.onWindowPropsReceived(() => {
-      process.title = `Mailspring ${this.getWindowType()}`;
+      process.title = `MK-Mail ${this.getWindowType()}`;
     });
 
     // Shortcut phased out in April 2026, remove in June/July 2026

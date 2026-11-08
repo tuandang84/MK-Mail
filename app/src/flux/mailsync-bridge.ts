@@ -290,7 +290,7 @@ export default class MailsyncBridge {
     if (!this._clients[accountId]) {
       const { emailAddress } = AccountStore.accountForId(accountId) || { emailAddress: undefined };
       return AppEnv.showErrorDialog({
-        title: localized(`Mailspring is unable to sync %@`, emailAddress),
+        title: localized(`MK-Mail is unable to sync %@`, emailAddress),
         message: localized(
           `In order to perform actions on this mailbox, you need to resolve the sync issue. Visit Preferences > Accounts for more information.`
         ),

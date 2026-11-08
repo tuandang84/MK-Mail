@@ -293,7 +293,7 @@ const start = () => {
   // StatusNotifierItem ID on Linux, causing their tray visibility settings
   // to be synchronized. See: https://github.com/electron/electron/issues/40936
   if (process.platform === 'linux') {
-    app.setName('Mailspring');
+    app.setName('MK-Mail');
   }
 
 
