@@ -210,6 +210,63 @@ function trash(threads: ThreadType[]) {
   Actions.popSheet();
 }
 
+function MoveToButton(props: { items: ThreadType[] }) {
+  const btnRef = React.useRef<HTMLButtonElement>(null);
+  const onClick = () => {
+    if (!props.items.length || !btnRef.current) return;
+    const { CategoryStore, AccountStore, ChangeFolderTask } = require('mailspring-exports');
+    const account = AccountStore.accountForItems(props.items);
+    if (!account) return;
+    const folders = CategoryStore.foldersForAccount(account.id).filter((f: any) => f.id);
+    if (!folders.length) return;
+    Actions.openPopover(
+      React.createElement(
+        'div',
+        { className: 'category-picker-popover mk-move-popover' },
+        folders.map((f: any) =>
+          React.createElement(
+            'button',
+            {
+              key: f.id,
+              className: 'mk-move-item',
+              onClick: () => {
+                const tasks = TaskFactory.tasksForThreadsByAccountId(
+                  props.items,
+                  (accountThreads: any) => {
+                    return new ChangeFolderTask({
+                      folder: f,
+                      threads: accountThreads,
+                      source: 'Outlook Ribbon',
+                    });
+                  }
+                );
+                Actions.queueTasks(tasks as any);
+                Actions.popSheet();
+                Actions.closePopover();
+              },
+            },
+            f.name
+          )
+        )
+      ),
+      { originRect: btnRef.current.getBoundingClientRect(), direction: 'down' }
+    );
+  };
+  return (
+    <button
+      ref={btnRef}
+      tabIndex={0}
+      className="mk-ribbon-btn"
+      title={localized('Move to')}
+      aria-label={localized('Move to')}
+      onClick={onClick}
+    >
+      <RibbonIcon name="move" />
+      <span className="mk-ribbon-label">{localized('Move to')}</span>
+    </button>
+  );
+}
+
 function RibbonSearch() {
   const [value, setValue] = React.useState('');
   const submit = () => {
@@ -357,15 +414,20 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
             </RibbonGroup>
             <div className="mk-ribbon-separator" />
             <RibbonGroup title={localized('Move')}>
-              <RibbonButton
-                icon="move"
-                label={localized('Move to')}
-                onClick={() => archive(items)}
-              />
+              <MoveToButton items={items} />
               <RibbonButton
                 icon="markRead"
                 label={localized('Mark Read')}
-                onClick={() => archive(items)}
+                onClick={() => {
+                  if (!items.length) return;
+                  const tasks = TaskFactory.taskForSettingUnread({
+                    threads: items,
+                    unread: false,
+                    source: 'Outlook Ribbon',
+                  });
+                  Actions.queueTasks(tasks as any);
+                  Actions.popSheet();
+                }}
               />
             </RibbonGroup>
             <div className="mk-ribbon-spacer" />
