@@ -77,14 +77,16 @@ export function activate() {
       order: 2,
     })
   );
-  PreferencesUIStore.registerPreferencesTab(
-    new PreferencesUIStore.TabItem({
-      tabId: 'Subscription',
-      displayName: localized('Subscription'),
-      componentClassFn: () => require('./tabs/preferences-identity').default,
-      order: 3,
-    })
-  );
+  // Slim MK-Mail: hide Subscription tab (keep code for later, do not register it)
+  // PreferencesUIStore.registerPreferencesTab(
+  //   new PreferencesUIStore.TabItem({
+  //     tabId: 'Subscription',
+  //     displayName: localized('Subscription'),
+  //     componentClassFn: () => require('./tabs/preferences-identity').default,
+  //     order: 3,
+  //   })
+  // );
+  // Keep Appearance order 4 etc. — missing 3 is fine, UI just shows fewer tabs.
   PreferencesUIStore.registerPreferencesTab(
     new PreferencesUIStore.TabItem({
       tabId: 'Appearance',

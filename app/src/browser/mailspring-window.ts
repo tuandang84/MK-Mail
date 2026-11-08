@@ -137,7 +137,7 @@ export default class MailspringWindow extends EventEmitter {
       autoHideMenuBar,
     };
 
-    if (this.neverClose || this.isSpec) {
+    if (this.isSpec) {
       // Prevents DOM timers from being suspended when the main window is hidden.
       // Means there's not an awkward catch-up when you re-show the main window.
       // For spec windows, this is critical: the hidden spec window would otherwise
@@ -145,6 +145,9 @@ export default class MailspringWindow extends EventEmitter {
       // the full test suite to exceed CI time limits.
       browserWindowOptions.webPreferences.backgroundThrottling = false;
     }
+    // Slim MK-Mail: keep background throttling enabled for hidden main
+    // windows (neverClose). Throttling timers when hidden saves RAM/CPU
+    // for a POP3-only client that polls every 2 minutes anyway.
 
     // Don't set icon on Windows so the exe's ico will be used as window and
     // taskbar's icon. See https://github.com/atom/atom/issues/4811 for more.

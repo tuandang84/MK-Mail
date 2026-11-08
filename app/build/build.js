@@ -360,6 +360,15 @@ function buildPackagerOptions() {
       /node_modules[/]+@node-llama-cpp/,
       /node_modules[/]+node-llama-cpp/,
       /node_modules[/]+pdfjs-dist/,
+      // Slim MK-Mail v1.26.17: drop heavy optional packages (translation,
+      // link-tracking, activity, views, mcp-server, open-tracking) — core
+      // POP3/IMAP mail does not need them, but keep their code stubs so
+      // imports do not crash (their package.json still exists, lib ignored).
+      /^\/internal_packages[/]+translation/,
+      /^\/internal_packages[/]+link-tracking/,
+      /^\/internal_packages[/]+activity/,
+      /^\/internal_packages[/]+open-tracking/,
+      /^\/internal_packages[/]+translation-*/,
       nodeLlamaCppBinariesToIgnore(),
     ],
     out: outputDir,
@@ -410,10 +419,10 @@ function buildPackagerOptions() {
         }
       : undefined,
     win32metadata: {
-      CompanyName: 'Foundry 376, LLC',
-      FileDescription: 'Mailspring',
-      LegalCopyright: `Copyright (C) 2014-${new Date().getFullYear()} Foundry 376, LLC. All rights reserved.`,
-      ProductName: 'Mailspring',
+      CompanyName: 'MK-Mail',
+      FileDescription: 'MK-Mail',
+      LegalCopyright: `Copyright (C) 2014-${new Date().getFullYear()} MK-Mail. All rights reserved.`,
+      ProductName: 'MK-Mail',
     },
     // NOTE: The following plist keys can NOT be set in the extra.plist since
     // they are manually overridden by electron-packager based on this config:

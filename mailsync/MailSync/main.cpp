@@ -1209,11 +1209,16 @@ string exectuablePath = argv[0];
                 runCalContactsSyncWorker();
             });
         }
-        metadataThread = new std::thread([&]() {
-             SetThreadName("metadata");
-             metadataWorker = make_shared<MetadataWorker>(account);
-             metadataWorker->run();
-        });
+        // Slim MK-Mail: POP3-only clients have no Mailspring cloud identity,
+        // so the MetadataWorker (delta streaming to id.getmailspring.com)
+        // would just error/retry and waste CPU/RAM. Skip it for POP3.
+        if (!account->isPOP3()) {
+            metadataThread = new std::thread([&]() {
+                 SetThreadName("metadata");
+                 metadataWorker = make_shared<MetadataWorker>(account);
+                 metadataWorker->run();
+            });
+        }
         metadataExpirationThread = new std::thread([&]() {
             SetThreadName("metadataExpiration");
             metadataExpirationWorker = make_shared<MetadataExpirationWorker>(account->id());
