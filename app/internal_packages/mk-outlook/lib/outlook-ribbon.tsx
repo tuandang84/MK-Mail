@@ -1,4 +1,5 @@
 import React from 'react';
+import { RetinaImg } from 'mailspring-component-kit';
 import {
   localized,
   Actions,
@@ -22,7 +23,13 @@ type IconName =
   | 'junk'
   | 'move'
   | 'markRead'
-  | 'print';
+  | 'print'
+  | 'folder'
+  | 'info'
+  | 'help'
+  | 'settings'
+  | 'grid'
+  | 'search';
 
 // Lucide (https://lucide.dev) — MIT, widely used. Inline SVG so it works offline
 // and stays crisp at 24px, unlike the old grayscale mask PNGs that faded.
@@ -95,6 +102,43 @@ const ICON_PATHS: Record<IconName, React.ReactNode> = {
       <polyline points="6 9 6 2 18 2 18 9" />
       <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
       <rect width="12" height="8" x="6" y="14" />
+    </>
+  ),
+  folder: (
+    <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+  ),
+  info: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
+    </>
+  ),
+  help: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
+    </>
+  ),
+  settings: (
+    <>
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+      <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  grid: (
+    <>
+      <rect width="7" height="7" x="3" y="3" rx="1" />
+      <rect width="7" height="7" x="14" y="3" rx="1" />
+      <rect width="7" height="7" x="14" y="14" rx="1" />
+      <rect width="7" height="7" x="3" y="14" rx="1" />
+    </>
+  ),
+  search: (
+    <>
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
     </>
   ),
 };
@@ -173,7 +217,7 @@ function RibbonSearch() {
   };
   return (
     <div className="mk-ribbon-search">
-      <span className="mk-ribbon-search-icon">🔍</span>
+      <RibbonIcon name="search" />
       <input
         tabIndex={0}
         className="mk-ribbon-search-input"
@@ -211,6 +255,16 @@ const TABS = ['File', 'Home', 'View', 'Help'] as const;
 export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }> {
   static displayName = 'OutlookGlobalRibbon';
   state = { tab: 'Home' };
+
+  _openPreferences = () => {
+    (AppEnv as any).focus?.();
+    Actions.openPreferences?.();
+    // Fallback: dispatch the app's open-preferences command via the browser process.
+    if (typeof (window as any).openPreferences === 'function') {
+      (window as any).openPreferences();
+    }
+  };
+
   render() {
     const { tab } = this.state;
     const items = this.props.items || [];
@@ -327,17 +381,136 @@ export class OutlookGlobalRibbon extends React.Component<Props, { tab: string }>
             </RibbonGroup>
           </div>
         )}
-        {tab !== 'Home' && (
-          <div className="mk-ribbon mk-ribbon-empty">
-            <span className="mk-ribbon-empty-note">
-              {tab === 'File'
-                ? localized(
-                    'File menu — New / Open / Save / Print / Exit are in the app menu (top-left).'
-                  )
-                : tab === 'View'
-                  ? localized('View — Reading Pane / Folder Pane toggles are in Preferences.')
-                  : localized('Help — see Preferences and the MK-Mail Release notes.')}
-            </span>
+        {tab === 'File' && (
+          <div className="mk-ribbon">
+            <RibbonGroup title={localized('Account')}>
+              <RibbonButton
+                icon="compose"
+                label={localized('New Mail')}
+                primary
+                onClick={() => Actions.composeNewBlankDraft()}
+              />
+              <RibbonButton
+                icon="folder"
+                label={localized('Import')}
+                onClick={() => {
+                  const url = 'https://github.com/tuandang84/MK-Mail';
+                  const { shell } = require('electron');
+                  shell.openExternal(url);
+                }}
+              />
+            </RibbonGroup>
+            <div className="mk-ribbon-separator" />
+            <RibbonGroup title={localized('Info')}>
+              <RibbonButton
+                icon="info"
+                label={localized('Info')}
+                onClick={() => {
+                  const { shell } = require('electron');
+                  shell.openExternal('https://github.com/tuandang84/MK-Mail');
+                }}
+              />
+              <RibbonButton
+                icon="settings"
+                label={localized('Settings')}
+                onClick={() =>
+                  (require('@electron/remote') as any)
+                    .getCurrentWindow()
+                    ?.webContents?.send?.('open-preferences')
+                }
+              />
+            </RibbonGroup>
+            <div className="mk-ribbon-separator" />
+            <RibbonGroup title={localized('Close')}>
+              <RibbonButton
+                icon="print"
+                label={localized('Print')}
+                onClick={() => window.print()}
+              />
+              <RibbonButton
+                icon="trash"
+                label={localized('Close')}
+                onClick={() => {
+                  const { app } = require('electron');
+                  app.quit();
+                }}
+              />
+            </RibbonGroup>
+          </div>
+        )}
+        {tab === 'View' && (
+          <div className="mk-ribbon">
+            <RibbonGroup title={localized('Layout')}>
+              <RibbonButton
+                icon="grid"
+                label={localized('Reading Pane')}
+                onClick={() => {
+                  this.setState({ tab: 'Home' });
+                }}
+              />
+              <RibbonButton
+                icon="folder"
+                label={localized('Folder Pane')}
+                onClick={() => {
+                  this.setState({ tab: 'Home' });
+                }}
+              />
+            </RibbonGroup>
+            <div className="mk-ribbon-separator" />
+            <RibbonGroup title={localized('Show')}>
+              <RibbonButton
+                icon="search"
+                label={localized('Search')}
+                onClick={() => {
+                  (document.querySelector('.mk-ribbon-search-input') as any)?.focus();
+                }}
+              />
+              <RibbonButton
+                icon="print"
+                label={localized('Print')}
+                onClick={() => window.print()}
+              />
+            </RibbonGroup>
+          </div>
+        )}
+        {tab === 'Help' && (
+          <div className="mk-ribbon">
+            <RibbonGroup title={localized('Support')}>
+              <RibbonButton
+                icon="help"
+                label={localized('Help')}
+                onClick={() => {
+                  const { shell } = require('electron');
+                  shell.openExternal('https://github.com/tuandang84/MK-Mail');
+                }}
+              />
+              <RibbonButton
+                icon="info"
+                label={localized('About')}
+                onClick={() => {
+                  const { dialog } = require('@electron/remote');
+                  const { app } = require('electron');
+                  dialog.showMessageBox({
+                    message: `MK-Mail ${app.getVersion()}`,
+                    detail: localized(
+                      'MK-Mail — Classic Outlook-style client with POP3 & SMTP support.'
+                    ),
+                    buttons: ['OK'],
+                  });
+                }}
+              />
+            </RibbonGroup>
+            <div className="mk-ribbon-separator" />
+            <RibbonGroup title={localized('Feedback')}>
+              <RibbonButton
+                icon="folder"
+                label={localized('Release')}
+                onClick={() => {
+                  const { shell } = require('electron');
+                  shell.openExternal('https://github.com/tuandang84/MK-Mail/releases');
+                }}
+              />
+            </RibbonGroup>
           </div>
         )}
       </div>
